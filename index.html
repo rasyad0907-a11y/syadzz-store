@@ -5644,6 +5644,34 @@ async function submitCalculatorPayment(){
         return;
     }
 
+    /*
+       CEK AKSES TERLEBIH DAHULU.
+       Ini mencegah bukti pembayaran ter-upload sia-sia ketika backend
+       sudah menganggap akun sebagai Premium aktif.
+    */
+    setCalculatorPaymentStatus("Memeriksa status Premium...", "waiting");
+    let currentAccess = null;
+    try{
+        const {data, error} = await supabaseClient.rpc("get_calculator_access_v1");
+        if(!error){
+            currentAccess = Array.isArray(data) ? data[0] : data;
+        }
+    }catch(checkError){
+        console.warn("Gagal cek akses sebelum pembayaran:", checkError);
+    }
+
+    const alreadyPremium = currentAccess?.has_access === true || currentAccess?.status === "approved";
+    if(alreadyPremium){
+        calculatorPremiumActive = true;
+        calculatorPlan = "premium";
+        setCalculatorPlanButtons();
+        showCalculatorPanel("calculatorAccessGranted", true);
+        showCalculatorPanel("calculatorPaymentPanel", false);
+        setCalculatorPaymentStatus("✅ Premium kamu sudah aktif permanent. Tidak perlu mengirim pembayaran lagi.", "success");
+        await loadCalculatorAccess();
+        return;
+    }
+
     setCalculatorPaymentStatus("Mengupload bukti pembayaran...", "waiting");
     const ext = (proof.name.split(".").pop() || "jpg").toLowerCase();
     const safeExt = ["jpg","jpeg","png","webp"].includes(ext) ? ext : "jpg";
@@ -5663,11 +5691,25 @@ async function submitCalculatorPayment(){
         p_proof_path: proofPath
     });
     if(error){
-        setCalculatorPaymentStatus("Pengajuan gagal: " + (error.message || "Error"), "error");
+        const message = error.message || "Error";
+        if(/akses premium.*sudah aktif|premium.*sudah aktif/i.test(message)){
+            /* Backend menyatakan Premium sudah aktif; sinkronkan UI. */
+            try{
+                await supabaseClient.storage.from("payment-proofs").remove([proofPath]);
+            }catch(cleanupError){
+                console.warn("Bukti tidak dapat dibersihkan setelah status Premium aktif:", cleanupError);
+            }
+            setCalculatorPaymentStatus("✅ Premium kamu sudah aktif permanent. Pengajuan baru tidak diperlukan.", "success");
+            await loadCalculatorAccess();
+            return;
+        }
+        setCalculatorPaymentStatus("Pengajuan gagal: " + message, "error");
         return;
     }
 
     setCalculatorPaymentStatus("✅ Bukti berhasil dikirim. Kalkulator tetap terkunci sampai admin memverifikasi pembayaran.", "success");
+    const proofInput = document.getElementById("calculatorPaymentProof");
+    if(proofInput) proofInput.value = "";
     await loadCalculatorAccess();
 }
 
