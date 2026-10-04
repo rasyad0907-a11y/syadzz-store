@@ -1673,10 +1673,7 @@ PROMO MONITOR
 <div class="calculator-payment-card">
 <div class="calculator-payment-head">
 <div class="calculator-payment-title">🧮 VERIFIKASI AKSES KALKULATOR — Rp5.000 PERMANENT</div>
-<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
 <div id="calculatorPaymentAdminCount" class="calculator-payment-count">0 MENUNGGU</div>
-<button class="btn btn-secondary" type="button" onclick="loadCalculatorPaymentRequests();loadCalculatorUsers();">↻ REFRESH</button>
-</div>
 </div>
 <div id="calculatorPaymentAdminList" class="calculator-payment-list">
 <div class="calculator-payment-empty">Memuat pengajuan pembayaran kalkulator...</div>
@@ -2846,8 +2843,6 @@ async function loadCalculatorPaymentRequests(){
     const count = document.getElementById("calculatorPaymentAdminCount");
     if(!list) return;
 
-    list.innerHTML = '<div class="calculator-payment-empty">Memuat pengajuan kalkulator...</div>';
-
     const {data, error} = await supabaseClient.rpc("get_calculator_access_requests_admin_v1");
     if(error){
         list.innerHTML = '<div class="calculator-payment-empty">Gagal memuat pembayaran kalkulator:<br>' + escapeHtml(error.message || "Error") + '</div>';
@@ -2855,21 +2850,12 @@ async function loadCalculatorPaymentRequests(){
         return;
     }
 
-    const rows = Array.isArray(data) ? data : [];
+    const rows = data || [];
     const pending = rows.filter(r => r.status === "pending");
     if(count) count.innerText = pending.length + " MENUNGGU";
 
     if(!rows.length){
-        list.innerHTML = `
-            <div class="calculator-payment-empty">
-                Belum ada pengajuan pembayaran yang bisa diverifikasi.<br>
-                <span style="display:block;margin-top:8px;font-size:11px;line-height:1.55;opacity:.85;">
-                    Cek bagian <b>AKUN KALKULATOR</b> di bawah untuk melihat akun yang sudah
-                    berstatus Premium, Gratis, Menunggu, atau Dicabut. Bila customer mendapat
-                    pesan <b>“Akses Premium kamu sudah aktif”</b> tetapi tidak mempunyai pengajuan
-                    pending, berarti status akses di database sedang tidak sinkron dengan riwayat pembayaran.
-                </span>
-            </div>`;
+        list.innerHTML = '<div class="calculator-payment-empty">Belum ada pengajuan akses kalkulator.</div>';
         return;
     }
 
@@ -3212,20 +3198,14 @@ function renderCalculatorUsers(){
         const label = getCalculatorUserStatusLabel(status);
         const created = row.created_at ? new Date(row.created_at).toLocaleString("id-ID") : "-";
         const lastSignIn = row.last_sign_in_at ? new Date(row.last_sign_in_at).toLocaleString("id-ID") : "Belum pernah login";
-        const requestState = row.request_status
-            ? "Pembayaran: " + row.request_status
-            : (status === "premium"
-                ? "Premium aktif. Tidak ada pengajuan pembayaran yang terhubung."
-                : "Belum ada pengajuan Premium");
+        const requestState = row.request_status ? "Pembayaran: " + row.request_status : "Belum ada pengajuan Premium";
         const safeUserId = String(row.user_id || "").replace(/\'/g, "\\'");
         const safeEmail = String(row.email || "").replace(/\'/g, "\\'");
         const idAttr = escapeHtml(String(row.user_id || ""));
         const checked = selectedCalculatorUserIds.has(String(row.user_id || "")) ? " checked" : "";
         const actions = (status === "premium" && row.request_id
             ? '<button class="btn btn-danger" type="button" onclick="revokeCalculatorAccess(\'' + String(row.request_id).replace(/\'/g, "\\'") + '\')">🚫 CABUT</button>'
-            : status === "premium"
-                ? '<span style="font-size:10px;color:#8c8ca4;display:inline-block;padding:8px 0;">PREMIUM AKTIF — tidak ada request untuk dicabut</span>'
-                : '<button class="btn btn-primary" type="button" onclick="grantCalculatorPremiumByUserId(\'' + safeUserId + '\',\'' + safeEmail + '\')">👑 GRANT PREMIUM</button>')
+            : '<button class="btn btn-primary" type="button" onclick="grantCalculatorPremiumByUserId(\'' + safeUserId + '\',\'' + safeEmail + '\')">👑 GRANT PREMIUM</button>')
             + ' <button class="btn btn-danger" type="button" onclick="deleteCalculatorUser(\'' + safeUserId + '\',\'' + safeEmail + '\')">🗑️ HAPUS</button>';
 
         return '<div class="calculator-user-item">' +
@@ -3264,6 +3244,8 @@ async function loadEverything(){
         loadPackageSlotsAdmin(),
         loadPromos(),
         loadStoreSettingsAdmin(),
+        loadCalculatorPaymentRequests(),
+        loadCalculatorUsers(),
         loadCalculatorPaymentRequests(),
         loadCalculatorUsers()
     ]);
