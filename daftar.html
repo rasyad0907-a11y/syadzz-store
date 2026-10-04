@@ -17,7 +17,6 @@ input:focus{border-color:#ffd900}
 button{width:100%;padding:11px;border:0;border-radius:9px;font-weight:900;cursor:pointer;margin-top:10px}
 .primary{background:linear-gradient(90deg,#ffd900,#ff9f00);color:#111}.secondary{background:#303047;color:#fff}
 .msg{margin-top:11px;text-align:center;font-size:12px;line-height:1.5;min-height:18px}.error{color:#ff9aaa}.success{color:#8dffc6}.waiting{color:#ffe866}
-.otp-box{display:none;margin-top:14px;padding:13px;border:1px solid #2d2d43;border-radius:12px;background:#10101d}
 .small{color:#8c8ca4;font-size:10px;line-height:1.5;margin-top:7px}
 .back{margin-top:12px;text-align:center}.back a{color:#aaa;font-size:11px;text-decoration:none}.back a:hover{color:#fff}
 </style>
@@ -30,26 +29,14 @@ button{width:100%;padding:11px;border:0;border-radius:9px;font-weight:900;cursor
     <div id="registerForm">
         <label>Email</label>
         <input id="registerEmail" type="email" autocomplete="email" placeholder="Masukkan email kamu">
-        <div class="small">OTP hanya digunakan saat membuat akun. Setelah akun berhasil dibuat, kamu bisa masuk dari halaman Calculator dengan email terdaftar.</div>
-        <button id="sendOtpBtn" class="primary" type="button" onclick="sendRegisterOtp()">KIRIM OTP</button>
+        <label>Password</label>
+        <input id="registerPassword" type="password" autocomplete="new-password" placeholder="Buat password minimal 6 karakter">
+        <label>Konfirmasi Password</label>
+        <input id="registerPasswordConfirm" type="password" autocomplete="new-password" placeholder="Masukkan ulang password">
+        <div class="small">Buat akun menggunakan email dan password. Setelah akun berhasil dibuat, kamu bisa langsung masuk dari halaman Calculator.</div>
+        <button id="registerBtn" class="primary" type="button" onclick="registerAccount()">BUAT AKUN</button>
         <div id="registerMsg" class="msg"></div>
     </div>
-
-    <button id="enterOtpBtn" class="primary" type="button" onclick="showOtpEntry()" style="display:none">MASUKKAN OTP</button>
-
-    <div id="otpBox" class="otp-box">
-        <div style="font-weight:900;font-size:13px">📩 VERIFIKASI EMAIL</div>
-        <div id="otpInfo" class="small">Kode OTP sudah dikirim ke email kamu. Gunakan kode dari email TERBARU.</div>
-        <div id="otpEntryArea" style="display:none">
-            <label>Kode OTP</label>
-            <input id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456">
-            <button id="verifyBtn" class="primary" type="button" onclick="verifyRegisterOtp()">VERIFIKASI & BUAT AKUN</button>
-        </div>
-        <button id="resendBtn" class="secondary" type="button" onclick="resendRegisterOtp()" disabled>KIRIM ULANG OTP (60)</button>
-        <button class="secondary" type="button" onclick="backToRegister()">GANTI EMAIL</button>
-        <div id="otpMsg" class="msg"></div>
-    </div>
-
     <div class="back"><a href="index.html#calculatorPage">← Kembali ke Calculator</a></div>
 </div>
 <script>
@@ -58,151 +45,68 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_uLjeOGdhxSQUjc4fCrkN9Q_QGabJxzu
 const supabaseClient = window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const LOGIN_KEY = "syadzz_calculator_email";
 const LOGOUT_KEY = "syadzz_calculator_logged_out";
-let registerEmail = "";
-let cooldownUntil = 0;
-let cooldownTimer = null;
 let busy = false;
 
 function setMsg(id,text,type){const el=document.getElementById(id);el.className="msg"+(type?" "+type:"");el.innerText=text||""}
-function secondsFromMessage(msg){const m=String(msg||"").match(/(?:after|dalam|in)\s+(\d+)\s*seconds?/i);return m?Number(m[1]):60}
-function startCooldown(seconds){
-    cooldownUntil=Date.now()+Math.max(1,seconds)*1000;
-    clearInterval(cooldownTimer);
-    const btn=document.getElementById("resendBtn");
-    const tick=()=>{const left=Math.max(0,Math.ceil((cooldownUntil-Date.now())/1000));btn.disabled=left>0;btn.textContent=left>0?`KIRIM ULANG OTP (${left})`:"KIRIM ULANG OTP";if(left<=0)clearInterval(cooldownTimer)};
-    tick();cooldownTimer=setInterval(tick,1000);
-}
-async function sendRegisterOtp(){
-    if(busy)return;
-    const email=(document.getElementById("registerEmail").value||"").trim().toLowerCase();
-    if(!email){setMsg("registerMsg","Masukkan email terlebih dahulu.","error");return}
-    busy=true;setMsg("registerMsg","Mengecek email...","waiting");
-    try{
-        const {data:registered,error:checkError}=await supabaseClient.rpc("is_calculator_email_registered_v1",{p_email:email});
-        if(checkError){setMsg("registerMsg","Gagal mengecek email: "+checkError.message,"error");return}
-        if(registered===true){setMsg("registerMsg","Email sudah terdaftar. Silakan kembali ke Calculator dan klik MASUK.","error");return}
-        setMsg("registerMsg","Mengirim OTP...","waiting");
-        const {error}=await supabaseClient.auth.signInWithOtp({email,options:{shouldCreateUser:true}});
-        if(error){
-            const msg=error.message||"Error";
-            const wait=secondsFromMessage(msg);
-            const isCooldown=/for security purposes.*only request this after\s+\d+\s+seconds?/i.test(msg);
-            if(isCooldown){
-                startCooldown(wait);
-                setMsg("registerMsg",`Coba lagi dalam ${wait} detik.`,"error");
-                return;
-            }
-            setMsg("registerMsg","Pendaftaran gagal: "+msg,"error");
-            return;
-        }
-        registerEmail=email;
-        document.getElementById("registerForm").style.display="none";
-        document.getElementById("enterOtpBtn").style.display="block";
-        document.getElementById("otpBox").style.display="none";
-        document.getElementById("otpEntryArea").style.display="none";
-        document.getElementById("otpInfo").innerText=`Kode OTP sudah dikirim ke ${email}. Cek inbox/spam.`;
-        setMsg("registerMsg","✅ OTP sudah dikirim ke email kamu. Klik MASUKKAN OTP.","success");
-        setMsg("otpMsg","✅ OTP sudah dikirim. Klik MASUKKAN OTP untuk melanjutkan.","waiting");
-        startCooldown(60);
-    }finally{busy=false}
-}
-async function resendRegisterOtp(){
-    if(busy)return;
-    const left=Math.max(0,Math.ceil((cooldownUntil-Date.now())/1000));
-    if(left>0){startCooldown(left);return}
-    if(!registerEmail){setMsg("otpMsg","Email pendaftaran tidak ditemukan.","error");return}
-    busy=true;setMsg("otpMsg","Mengirim OTP baru...","waiting");
-    try{
-        const {error}=await supabaseClient.auth.signInWithOtp({email:registerEmail,options:{shouldCreateUser:true}});
-        if(error){
-            const msg=error.message||"Error";
-            const wait=secondsFromMessage(msg);
-            const isCooldown=/for security purposes.*only request this after\s+\d+\s+seconds?/i.test(msg);
-            if(isCooldown){
-                startCooldown(wait);
-                setMsg("otpMsg",`Coba lagi dalam ${wait} detik.`,"error");
-            }else{
-                setMsg("otpMsg","Gagal mengirim OTP: "+msg,"error");
-            }
-            return;
-        }
-        setMsg("otpMsg","✅ OTP baru sudah dikirim. Cek inbox/spam.","success");startCooldown(60);
-    }finally{busy=false}
-}
-async function verifyRegisterOtp(){
+
+async function registerAccount(){
     if(busy)return;
 
-    const otpInput=document.getElementById("otpCode");
-    const verifyBtn=document.getElementById("verifyBtn");
-    const token=(otpInput.value||"").replace(/\D/g,"");
+    const email=(document.getElementById("registerEmail")?.value||"").trim().toLowerCase();
+    const password=document.getElementById("registerPassword")?.value||"";
+    const confirm=document.getElementById("registerPasswordConfirm")?.value||"";
+    const btn=document.getElementById("registerBtn");
 
-    if(token.length!==6){
-        setMsg("otpMsg","Masukkan kode OTP 6 digit yang diterima di email.","error");
-        otpInput.focus();
+    if(!email){
+        setMsg("registerMsg","Masukkan email terlebih dahulu.","error");
         return;
     }
-
-    if(!registerEmail){
-        setMsg("otpMsg","Email pendaftaran tidak ditemukan. Silakan kirim OTP lagi.","error");
+    if(password.length<6){
+        setMsg("registerMsg","Password minimal 6 karakter.","error");
+        return;
+    }
+    if(password!==confirm){
+        setMsg("registerMsg","Konfirmasi password tidak sama.","error");
         return;
     }
 
     busy=true;
-    verifyBtn.disabled=true;
-    setMsg("otpMsg","Memverifikasi OTP...","waiting");
+    if(btn){btn.disabled=true;btn.textContent="MEMBUAT AKUN...";}
+    setMsg("registerMsg","Mengecek email...","waiting");
 
     try{
-        // Untuk email OTP Supabase gunakan type: "email".
-        // Jangan fallback ke type "signup" karena itu adalah alur berbeda.
-        const {data,error}=await supabaseClient.auth.verifyOtp({
-            email:registerEmail,
-            token,
-            type:"email"
-        });
+        const {data:registered,error:checkError}=await supabaseClient.rpc("is_calculator_email_registered_v1",{p_email:email});
+        if(checkError){
+            setMsg("registerMsg","Gagal mengecek email: "+checkError.message,"error");
+            return;
+        }
+        if(registered===true){
+            setMsg("registerMsg","Email sudah terdaftar. Silakan kembali ke Calculator dan klik MASUK.","error");
+            return;
+        }
+
+        setMsg("registerMsg","Membuat akun...","waiting");
+        const {data,error}=await supabaseClient.auth.signUp({email,password});
 
         if(error){
-            const msg=String(error.message||"Error");
-            otpInput.select();
-            setMsg(
-                "otpMsg",
-                "OTP gagal diverifikasi: "+msg+". Pastikan kode 6 digit dari email TERBARU.",
-                "error"
-            );
+            setMsg("registerMsg","Pendaftaran gagal: "+(error.message||"Error"),"error");
             return;
         }
 
-        if(!data?.session){
-            setMsg(
-                "otpMsg",
-                "OTP benar, tetapi sesi login belum tersedia. Coba kembali ke Calculator.",
-                "error"
-            );
-            return;
-        }
-
-        localStorage.setItem(LOGIN_KEY,registerEmail);
+        localStorage.setItem(LOGIN_KEY,email);
         localStorage.removeItem(LOGOUT_KEY);
-        otpInput.value="";
-        setMsg("otpMsg","✅ Akun berhasil dibuat. Mengarahkan ke Calculator...","success");
 
-        setTimeout(()=>{
-            window.location.href="index.html#calculatorPage";
-        },700);
-
+        if(data?.session){
+            setMsg("registerMsg","✅ Akun berhasil dibuat. Mengarahkan ke Calculator...","success");
+            setTimeout(()=>{window.location.href="index.html#calculatorPage";},500);
+        }else{
+            setMsg("registerMsg","✅ Akun berhasil dibuat. Silakan cek email bila diminta konfirmasi, lalu masuk menggunakan email + password di Calculator.","success");
+        }
     }finally{
         busy=false;
-        verifyBtn.disabled=false;
+        if(btn){btn.disabled=false;btn.textContent="BUAT AKUN";}
     }
 }
-function showOtpEntry(){
-    if(!registerEmail){setMsg("registerMsg","Email pendaftaran tidak ditemukan.","error");return}
-    document.getElementById("enterOtpBtn").style.display="none";
-    document.getElementById("otpBox").style.display="block";
-    document.getElementById("otpEntryArea").style.display="block";
-    document.getElementById("otpCode").focus();
-    setMsg("otpMsg","Masukkan kode OTP lengkap yang dikirim ke email kamu.","waiting");
-}
-function backToRegister(){clearInterval(cooldownTimer);cooldownUntil=0;registerEmail="";document.getElementById("otpBox").style.display="none";document.getElementById("otpEntryArea").style.display="none";document.getElementById("enterOtpBtn").style.display="none";document.getElementById("registerForm").style.display="block";document.getElementById("otpCode").value="";setMsg("otpMsg","");setMsg("registerMsg","")}
 </script>
 </body>
 </html>
