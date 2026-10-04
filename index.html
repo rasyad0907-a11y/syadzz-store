@@ -4634,32 +4634,43 @@ textarea:focus{
 <div class="calc-auth-grid">
 <label>Email Customer</label>
 <input id="calculatorAuthEmail" type="email" autocomplete="email" placeholder="Masukkan email kamu">
-<div style="font-size:10px;color:#8c8ca4;line-height:1.5;">Masukkan email yang sudah terdaftar, lalu klik MASUK. Pendaftaran akun baru menggunakan OTP.</div>
+<label>Password</label>
+<input id="calculatorAuthPassword" type="password" autocomplete="current-password" placeholder="Masukkan password kamu">
+<div style="font-size:10px;color:#8c8ca4;line-height:1.5;">Masukkan email dan password akun yang sudah terdaftar, lalu klik MASUK.</div>
 <div class="calc-auth-actions">
 <button class="btn btn-primary" type="button" onclick="calculatorLogin()">MASUK</button>
 <button id="calculatorRegisterBtn" class="btn btn-secondary" type="button" onclick="calculatorRegister()">DAFTAR AKUN</button>
 </div>
-<div id="calculatorAuthStatus" class="calc-status">Masukkan email terdaftar untuk masuk.</div>
+<div style="margin-top:8px;text-align:center;">
+<button type="button" class="calc-link-btn" onclick="showPremiumPasswordSetup()">👑 PREMIUM LAMA — BUAT PASSWORD</button>
+</div>
+<div id="calculatorAuthStatus" class="calc-status">Masukkan email dan password untuk masuk.</div>
 </div>
 </div>
 
-<div id="calculatorOtpPanel" style="display:none;">
+<div id="calculatorRecoveryPanel" style="display:none;">
 <div class="calc-recovery-box">
-<div style="font-weight:900;font-size:13px;">📩 VERIFIKASI EMAIL</div>
-<div id="calculatorOtpInfo" style="font-size:10px;color:#8c8ca4;line-height:1.5;">Kode OTP sudah dikirim ke email kamu.</div>
-<label>Kode OTP</label>
-<input id="calculatorOtpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Masukkan kode OTP">
+<div style="font-weight:900;font-size:13px;">👑 PREMIUM LAMA</div>
+<div style="font-size:10px;color:#a4a4b8;line-height:1.5;">Kalau kamu sudah mempunyai Premium dari sistem lama tetapi belum pernah membuat password, masukkan email akun Premium untuk menerima link pembuatan password.</div>
+<input id="calculatorPremiumRecoveryEmail" type="email" autocomplete="email" placeholder="Email akun Premium">
 <div class="calc-auth-actions">
-<button id="calculatorOtpVerifyBtn" class="btn btn-primary" type="button" onclick="calculatorVerifyOtp()">VERIFIKASI OTP</button>
-<button id="calculatorOtpResendBtn" class="btn btn-secondary" type="button" onclick="calculatorResendOtp()" disabled>KIRIM ULANG OTP (60)</button>
-<button class="btn btn-secondary" type="button" onclick="calculatorBackToAuth()">KEMBALI</button>
+<button class="btn btn-primary" type="button" onclick="sendPremiumPasswordSetup()">KIRIM LINK PASSWORD</button>
+<button class="btn btn-secondary" type="button" onclick="hidePremiumPasswordSetup()">KEMBALI LOGIN</button>
 </div>
-<div id="calculatorOtpStatus" class="calc-status" style="display:none;"></div>
+<div id="calculatorRecoveryStatus" class="calc-status"></div>
 </div>
 </div>
 
-<div id="calculatorRecoveryPanel" style="display:none;"></div>
-<div id="calculatorPasswordRecoveryPanel" style="display:none;"></div>
+<div id="calculatorPasswordRecoveryPanel" style="display:none;">
+<div class="calc-recovery-box">
+<div style="font-weight:900;font-size:13px;">🔐 BUAT PASSWORD PREMIUM</div>
+<div style="font-size:10px;color:#a4a4b8;line-height:1.5;">Buat password baru untuk akun Premium kamu. Setelah tersimpan, login berikutnya menggunakan email + password.</div>
+<input id="calculatorNewPremiumPassword" type="password" autocomplete="new-password" placeholder="Password baru minimal 6 karakter">
+<input id="calculatorNewPremiumPasswordConfirm" type="password" autocomplete="new-password" placeholder="Ulangi password baru">
+<button class="btn btn-primary" type="button" onclick="finishPremiumPasswordSetup()">SIMPAN PASSWORD</button>
+<div id="calculatorPasswordRecoveryStatus" class="calc-status"></div>
+</div>
+</div>
 
 <div id="calculatorAccountPanel" style="display:none;">
 <div class="calc-account">
@@ -5322,96 +5333,20 @@ function showCalculatorPanel(id, show){
     if(el) el.style.display = show ? "block" : "none";
 }
 
-let calculatorAuthMode = "login";
-let calculatorOtpEmail = "";
-let calculatorOtpBusy = false;
-let calculatorOtpCooldownUntil = 0;
-let calculatorOtpCooldownTimer = null;
-
-function setCalculatorOtpStatus(message, type){
-    const el = document.getElementById("calculatorOtpStatus");
-    if(!el) return;
-    el.style.display = message ? "block" : "none";
-    el.className = "calc-status" + (type ? " " + type : "");
-    el.innerText = message || "";
-}
-
-function startCalculatorOtpCooldown(seconds){
-    const total = Math.max(1, Number(seconds) || 60);
-    calculatorOtpCooldownUntil = Date.now() + total * 1000;
-    if(calculatorOtpCooldownTimer) clearInterval(calculatorOtpCooldownTimer);
-
-    const tick = () => {
-        const left = Math.max(0, Math.ceil((calculatorOtpCooldownUntil - Date.now()) / 1000));
-        const resendBtn = document.getElementById("calculatorOtpResendBtn");
-        const otpInfo = document.getElementById("calculatorOtpInfo");
-
-        if(resendBtn){
-            resendBtn.disabled = left > 0;
-            resendBtn.textContent = left > 0
-                ? `KIRIM ULANG OTP (${left})`
-                : "KIRIM ULANG OTP";
-        }
-
-        if(otpInfo && calculatorOtpEmail){
-            otpInfo.innerText = left > 0
-                ? `Kode OTP pendaftaran sudah dikirim ke ${calculatorOtpEmail}. Kode baru bisa diminta lagi setelah ${left} detik.`
-                : `Belum menerima OTP? Kamu bisa meminta kode baru sekarang.`;
-        }
-
-        if(left <= 0){
-            clearInterval(calculatorOtpCooldownTimer);
-            calculatorOtpCooldownTimer = null;
-        }
-    };
-
-    tick();
-    calculatorOtpCooldownTimer = setInterval(tick, 1000);
-}
-
-function getOtpWaitSeconds(message){
-    const text = String(message || "");
-    const match = text.match(/(?:after|dalam|in)\s+(\d+)\s*seconds?/i);
-    return match ? Number(match[1]) : 60;
-}
-
-function calculatorOpenOtpPanel(mode, email){
-    calculatorAuthMode = mode;
-    calculatorOtpEmail = email;
-    const info = document.getElementById("calculatorOtpInfo");
-    if(info){
-        info.innerText = mode === "register"
-            ? `Kode OTP pendaftaran sudah dikirim ke ${email}.`
-            : `Kode OTP sudah dikirim ke ${email}.`;
-    }
-    const resendBtn = document.getElementById("calculatorOtpResendBtn");
-    if(resendBtn){
-        resendBtn.disabled = true;
-        resendBtn.textContent = "KIRIM ULANG OTP (60)";
-    }
-    const code = document.getElementById("calculatorOtpCode");
-    if(code) code.value = "";
-    showCalculatorPanel("calculatorGuestPanel", false);
-    showCalculatorPanel("calculatorOtpPanel", true);
-    setCalculatorOtpStatus("Masukkan kode OTP dari email kamu (ikuti jumlah digit yang dikirim).", "waiting");
-}
-
-function calculatorBackToAuth(){
-    showCalculatorPanel("calculatorOtpPanel", false);
-    showCalculatorPanel("calculatorGuestPanel", true);
-    setCalculatorOtpStatus("", "");
-    calculatorOtpEmail = "";
-    calculatorAuthMode = "login";
-}
-
 async function calculatorLogin(){
     const email = (document.getElementById("calculatorAuthEmail")?.value || "").trim().toLowerCase();
+    const password = document.getElementById("calculatorAuthPassword")?.value || "";
+
     if(!email){
         setCalculatorAuthStatus("Masukkan email terlebih dahulu.", "error");
         return;
     }
+    if(!password){
+        setCalculatorAuthStatus("Masukkan password terlebih dahulu.", "error");
+        return;
+    }
 
-    // Kalau session Supabase masih aktif, jangan kirim OTP lagi.
+    // Kalau session Supabase masih aktif, gunakan session tersebut tanpa login ulang.
     const {data:{session}} = await supabaseClient.auth.getSession();
     if(session?.user?.email){
         const activeEmail = session.user.email.toLowerCase();
@@ -5422,160 +5357,132 @@ async function calculatorLogin(){
         return;
     }
 
-    setCalculatorAuthStatus("Mengecek email...", "waiting");
+    setCalculatorAuthStatus("Memproses login...", "waiting");
 
-    // Pastikan email memang sudah terdaftar.
-    const {data:registered, error:registeredError} = await supabaseClient.rpc("is_calculator_email_registered_v1", {
-        p_email: email
-    });
-
-    if(registeredError){
-        setCalculatorAuthStatus("Gagal mengecek email: " + (registeredError.message || "Error"), "error");
-        return;
-    }
-
-    if(registered !== true){
-        setCalculatorAuthStatus("Maaf, email anda belum terdaftar. Silakan buat akun terlebih dahulu.", "error");
-        return;
-    }
-
-    // Login pertama kali membutuhkan OTP untuk membuat session Supabase.
-    setCalculatorAuthStatus("Mengirim OTP login...", "waiting");
-
-    const {error:otpError} = await supabaseClient.auth.signInWithOtp({
+    const {data, error} = await supabaseClient.auth.signInWithPassword({
         email,
-        options:{
-            shouldCreateUser:false
-        }
+        password
     });
 
-    if(otpError){
-        const msg = otpError.message || "Error";
-        const wait = getOtpWaitSeconds(msg);
-        if(/rate.?limit|too many requests|only request this after|after \d+ seconds|\d+ seconds/i.test(msg)){
-            startCalculatorOtpCooldown(wait);
-        }
-        setCalculatorAuthStatus("Gagal mengirim OTP: " + msg, "error");
+    if(error){
+        const msg = error.message || "Login gagal.";
+        setCalculatorAuthStatus("Login gagal: " + msg, "error");
         return;
     }
 
-    calculatorOpenOtpPanel("login", email);
-    startCalculatorOtpCooldown(60);
-    setCalculatorOtpStatus("✅ OTP login sudah dikirim. Gunakan kode TERBARU dari email dan masukkan semua digitnya.", "success");
+    if(!data?.session){
+        setCalculatorAuthStatus("Login berhasil, tetapi sesi belum tersedia. Silakan coba lagi.", "error");
+        return;
+    }
+
+    localStorage.setItem(CALCULATOR_SOFT_LOGIN_KEY, email);
+    localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
+    calculatorAccessUser = {email};
+    setCalculatorAuthStatus("✅ Login berhasil.", "success");
+    await loadCalculatorAccess();
 }
 
 function calculatorRegister(){
     window.location.href = "daftar.html?from=calculator";
 }
 
-async function calculatorResendOtp(){
-    if(calculatorOtpBusy) return;
+function setCalculatorRecoveryStatus(message, type){
+    const el = document.getElementById("calculatorRecoveryStatus");
+    if(!el) return;
+    el.className = "calc-status" + (type ? " " + type : "");
+    el.innerText = message || "";
+}
 
-    const email = calculatorOtpEmail || (document.getElementById("calculatorAuthEmail")?.value || "").trim().toLowerCase();
+function setCalculatorPasswordRecoveryStatus(message, type){
+    const el = document.getElementById("calculatorPasswordRecoveryStatus");
+    if(!el) return;
+    el.className = "calc-status" + (type ? " " + type : "");
+    el.innerText = message || "";
+}
+
+function showPremiumPasswordSetup(){
+    showCalculatorPanel("calculatorGuestPanel", false);
+    showCalculatorPanel("calculatorRecoveryPanel", true);
+    showCalculatorPanel("calculatorPasswordRecoveryPanel", false);
+    setCalculatorRecoveryStatus("", "");
+    const email = (document.getElementById("calculatorAuthEmail")?.value || "").trim().toLowerCase();
+    const input = document.getElementById("calculatorPremiumRecoveryEmail");
+    if(input && email) input.value = email;
+}
+
+function hidePremiumPasswordSetup(){
+    showCalculatorPanel("calculatorRecoveryPanel", false);
+    showCalculatorPanel("calculatorPasswordRecoveryPanel", false);
+    showCalculatorPanel("calculatorGuestPanel", true);
+}
+
+async function sendPremiumPasswordSetup(){
+    const input = document.getElementById("calculatorPremiumRecoveryEmail");
+    const email = (input?.value || "").trim().toLowerCase();
     if(!email){
-        setCalculatorOtpStatus("Email OTP tidak ditemukan. Kembali lalu masukkan email lagi.", "error");
+        setCalculatorRecoveryStatus("Masukkan email akun Premium.", "error");
         return;
     }
 
-    const remaining = Math.max(0, Math.ceil((calculatorOtpCooldownUntil - Date.now()) / 1000));
-    if(remaining > 0){
-        startCalculatorOtpCooldown(remaining);
-        setCalculatorOtpStatus(`Tunggu ${remaining} detik sebelum meminta OTP baru.`, "waiting");
-        return;
-    }
-
-    calculatorOtpBusy = true;
-    const btn = document.getElementById("calculatorOtpResendBtn");
-    if(btn){
-        btn.disabled = true;
-        btn.textContent = "MENGIRIM...";
-    }
-    setCalculatorOtpStatus("Mengirim OTP baru...", "waiting");
+    setCalculatorRecoveryStatus("Mengecek status Premium...", "waiting");
 
     try{
-        const {error} = await supabaseClient.auth.signInWithOtp({
-            email,
-            options:{shouldCreateUser:false}
-        });
+        const {data, error:accessError} = await supabaseClient.rpc("get_calculator_access_by_email_v1", {p_email:email});
+        if(accessError) throw accessError;
 
-        if(error){
-            const msg = error.message || "Error";
-            const wait = getOtpWaitSeconds(msg);
-            if(/rate.?limit|too many requests|only request this after|after \d+ seconds|\d+ seconds/i.test(msg)){
-                startCalculatorOtpCooldown(wait);
-                setCalculatorOtpStatus(`Supabase masih membatasi pengiriman OTP. Tunggu ${wait} detik lalu coba lagi.`, "error");
-            }else{
-                setCalculatorOtpStatus("Gagal mengirim OTP baru: " + msg, "error");
-            }
+        const access = Array.isArray(data) ? data[0] : data;
+        const hasPremium = access?.has_access === true || access?.status === "approved";
+        if(!hasPremium){
+            setCalculatorRecoveryStatus("Email ini belum mempunyai Premium aktif. Gunakan DAFTAR AKUN atau MASUK biasa.", "error");
             return;
         }
 
-        startCalculatorOtpCooldown(60);
-        setCalculatorOtpStatus("✅ OTP baru sudah dikirim. Cek inbox/spam email kamu.", "success");
-    }finally{
-        calculatorOtpBusy = false;
+        const redirectTo = window.location.origin + window.location.pathname + "#calculatorPage";
+        const {error} = await supabaseClient.auth.resetPasswordForEmail(email, {redirectTo});
+        if(error) throw error;
+
+        setCalculatorRecoveryStatus("✅ Link pembuatan password sudah dikirim ke email. Buka email tersebut lalu buat password baru.", "success");
+    }catch(error){
+        setCalculatorRecoveryStatus("Gagal mengirim link: " + (error.message || "Error"), "error");
     }
 }
 
-async function calculatorVerifyOtp(){
-    if(calculatorOtpBusy) return;
-    const email = calculatorOtpEmail || (document.getElementById("calculatorAuthEmail")?.value || "").trim().toLowerCase();
-    const token = (document.getElementById("calculatorOtpCode")?.value || "").replace(/\D/g, "").slice(0,8);
+async function finishPremiumPasswordSetup(){
+    const password = document.getElementById("calculatorNewPremiumPassword")?.value || "";
+    const confirmPassword = document.getElementById("calculatorNewPremiumPasswordConfirm")?.value || "";
 
-    if(!email){
-        setCalculatorOtpStatus("Email OTP tidak ditemukan. Kembali lalu masukkan email lagi.", "error");
+    if(password.length < 6){
+        setCalculatorPasswordRecoveryStatus("Password minimal 6 karakter.", "error");
         return;
     }
-    if(![6,8].includes(token.length)){
-        setCalculatorOtpStatus("Masukkan kode OTP lengkap dari email (6 atau 8 digit).", "error");
+    if(password !== confirmPassword){
+        setCalculatorPasswordRecoveryStatus("Konfirmasi password tidak sama.", "error");
         return;
     }
 
-    calculatorOtpBusy = true;
-    const btn = document.getElementById("calculatorOtpVerifyBtn");
-    if(btn){
-        btn.disabled = true;
-        btn.textContent = "MEMVERIFIKASI...";
+    setCalculatorPasswordRecoveryStatus("Menyimpan password...", "waiting");
+    const {data:{session}} = await supabaseClient.auth.getSession();
+    if(!session?.user?.email){
+        setCalculatorPasswordRecoveryStatus("Sesi pembuatan password tidak ditemukan. Minta link baru.", "error");
+        return;
     }
-    setCalculatorOtpStatus("Memverifikasi OTP...", "waiting");
 
-    try{
-        const {data, error} = await supabaseClient.auth.verifyOtp({
-            email,
-            token,
-            type:"email"
-        });
+    const {error} = await supabaseClient.auth.updateUser({password});
+    if(error){
+        setCalculatorPasswordRecoveryStatus("Gagal menyimpan password: " + (error.message || "Error"), "error");
+        return;
+    }
 
-        if(error){
-            setCalculatorOtpStatus("OTP tidak valid atau sudah kedaluwarsa: " + (error.message || "Error"), "error");
-            return;
-        }
-
-        if(!data?.session){
-            setCalculatorOtpStatus("OTP berhasil diverifikasi, tetapi sesi login belum tersedia. Coba login kembali.", "error");
-            return;
-        }
-
-        calculatorOtpEmail = "";
-        calculatorOtpCooldownUntil = 0;
-        // Setelah OTP berhasil, tutup panel OTP tanpa perlu refresh.
-        showCalculatorPanel("calculatorOtpPanel", false);
-        setCalculatorOtpStatus("", "");
-        localStorage.setItem(CALCULATOR_SOFT_LOGIN_KEY, email);
-        localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
-        if(calculatorOtpCooldownTimer){
-            clearInterval(calculatorOtpCooldownTimer);
-            calculatorOtpCooldownTimer = null;
-        }
-        setCalculatorOtpStatus("✅ OTP benar. Login berhasil.", "success");
+    const email = session.user.email.toLowerCase();
+    localStorage.setItem(CALCULATOR_SOFT_LOGIN_KEY, email);
+    localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
+    calculatorAccessUser = {email};
+    setCalculatorPasswordRecoveryStatus("✅ Password berhasil dibuat. Membuka Kalkulator Premium...", "success");
+    setTimeout(async function(){
+        showCalculatorPanel("calculatorPasswordRecoveryPanel", false);
+        showCalculatorPanel("calculatorRecoveryPanel", false);
         await loadCalculatorAccess();
-    }finally{
-        calculatorOtpBusy = false;
-        if(btn){
-            btn.disabled = false;
-            btn.textContent = "VERIFIKASI OTP";
-        }
-    }
+    }, 500);
 }
 
 async function calculatorLogout(){
@@ -5599,7 +5506,6 @@ async function calculatorLogout(){
         showCalculatorPanel("calculatorGuestPanel", true);
         showCalculatorPanel("calculatorRecoveryPanel", false);
         showCalculatorPanel("calculatorPasswordRecoveryPanel", false);
-        showCalculatorPanel("calculatorOtpPanel", false);
         showCalculatorPanel("calculatorAccountPanel", false);
         showCalculatorPanel("calculatorPlanPanel", false);
         showCalculatorPanel("calculatorFreeStatus", false);
@@ -5633,7 +5539,6 @@ async function loadCalculatorAccess(){
         calculatorPlan = "free";
         lockCalculator();
         showCalculatorPanel("calculatorGuestPanel", true);
-        showCalculatorPanel("calculatorOtpPanel", false);
         showCalculatorPanel("calculatorAccountPanel", false);
         showCalculatorPanel("calculatorPlanPanel", false);
         setCalculatorCalculateButtonState(false);
@@ -5645,9 +5550,6 @@ async function loadCalculatorAccess(){
     localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
     calculatorAccessUser = {email};
 
-    // Jika sudah ada session/login, panel OTP harus selalu ditutup.
-    // Ini mencegah panel OTP tertinggal setelah verifikasi sukses.
-    showCalculatorPanel("calculatorOtpPanel", false);
     showCalculatorPanel("calculatorGuestPanel", false);
     showCalculatorPanel("calculatorAccountPanel", true);
     showCalculatorPanel("calculatorPlanPanel", true);
@@ -5822,14 +5724,14 @@ async function submitCalculatorPayment(){
 }
 
 supabaseClient.auth.onAuthStateChange(function(event, session){
-    setTimeout(function(){
+    setTimeout(async function(){
         if(event === "PASSWORD_RECOVERY"){
-            supabaseClient.auth.signOut();
             lockCalculator();
-            showCalculatorPanel("calculatorGuestPanel", true);
-            showCalculatorPanel("calculatorOtpPanel", false);
+            showCalculatorPanel("calculatorGuestPanel", false);
+            showCalculatorPanel("calculatorRecoveryPanel", false);
+            showCalculatorPanel("calculatorPasswordRecoveryPanel", true);
             showCalculatorPanel("calculatorAccountPanel", false);
-            setCalculatorAuthStatus("Login password sudah dinonaktifkan. Gunakan login email + OTP.", "error");
+            setCalculatorPasswordRecoveryStatus("Buat password baru untuk akun Premium kamu.", "waiting");
             return;
         }
 
