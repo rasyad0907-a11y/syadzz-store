@@ -4597,7 +4597,7 @@ textarea:focus{
 <div style="font-weight:900;font-size:13px;">📩 VERIFIKASI EMAIL</div>
 <div id="calculatorOtpInfo" style="font-size:10px;color:#8c8ca4;line-height:1.5;">Kode OTP sudah dikirim ke email kamu.</div>
 <label>Kode OTP</label>
-<input id="calculatorOtpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Masukkan 6 digit kode OTP">
+<input id="calculatorOtpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Masukkan kode OTP">
 <div class="calc-auth-actions">
 <button id="calculatorOtpVerifyBtn" class="btn btn-primary" type="button" onclick="calculatorVerifyOtp()">VERIFIKASI OTP</button>
 <button id="calculatorOtpResendBtn" class="btn btn-secondary" type="button" onclick="calculatorResendOtp()" disabled>KIRIM ULANG OTP (60)</button>
@@ -5342,7 +5342,7 @@ function calculatorOpenOtpPanel(mode, email){
     if(code) code.value = "";
     showCalculatorPanel("calculatorGuestPanel", false);
     showCalculatorPanel("calculatorOtpPanel", true);
-    setCalculatorOtpStatus("Masukkan kode OTP 6 digit dari email kamu.", "waiting");
+    setCalculatorOtpStatus("Masukkan kode OTP dari email kamu (ikuti jumlah digit yang dikirim).", "waiting");
 }
 
 function calculatorBackToAuth(){
@@ -5400,7 +5400,7 @@ async function calculatorLogin(){
 
     calculatorOpenOtpPanel("login", email);
     startCalculatorOtpCooldown(60);
-    setCalculatorOtpStatus("✅ OTP login sudah dikirim. Cek inbox/spam email kamu.", "success");
+    setCalculatorOtpStatus("✅ OTP login sudah dikirim. Gunakan kode TERBARU dari email dan masukkan semua digitnya.", "success");
 }
 
 function calculatorRegister(){
@@ -5434,7 +5434,7 @@ async function calculatorResendOtp(){
     try{
         const {error} = await supabaseClient.auth.signInWithOtp({
             email,
-            options:{shouldCreateUser:true}
+            options:{shouldCreateUser:false}
         });
 
         if(error){
@@ -5459,14 +5459,14 @@ async function calculatorResendOtp(){
 async function calculatorVerifyOtp(){
     if(calculatorOtpBusy) return;
     const email = calculatorOtpEmail || (document.getElementById("calculatorAuthEmail")?.value || "").trim().toLowerCase();
-    const token = (document.getElementById("calculatorOtpCode")?.value || "").replace(/\D/g, "").slice(0,6);
+    const token = (document.getElementById("calculatorOtpCode")?.value || "").replace(/\D/g, "").slice(0,8);
 
     if(!email){
         setCalculatorOtpStatus("Email OTP tidak ditemukan. Kembali lalu masukkan email lagi.", "error");
         return;
     }
-    if(token.length !== 6){
-        setCalculatorOtpStatus("Masukkan kode OTP 6 digit.", "error");
+    if(![6,8].includes(token.length)){
+        setCalculatorOtpStatus("Masukkan kode OTP lengkap dari email (6 atau 8 digit).", "error");
         return;
     }
 
