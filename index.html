@@ -5360,6 +5360,17 @@ async function calculatorLogin(){
         return;
     }
 
+    // Kalau session Supabase masih aktif, jangan kirim OTP lagi.
+    const {data:{session}} = await supabaseClient.auth.getSession();
+    if(session?.user?.email){
+        const activeEmail = session.user.email.toLowerCase();
+        localStorage.setItem(CALCULATOR_SOFT_LOGIN_KEY, activeEmail);
+        localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
+        calculatorAccessUser = {email:activeEmail};
+        await loadCalculatorAccess();
+        return;
+    }
+
     setCalculatorAuthStatus("Mengecek email...", "waiting");
 
     // Pastikan email memang sudah terdaftar.
@@ -5377,8 +5388,7 @@ async function calculatorLogin(){
         return;
     }
 
-    // PENTING: login harus benar-benar membuat session Supabase.
-    // Tanpa session, auth.uid() pada submit pembayaran akan NULL.
+    // Login pertama kali membutuhkan OTP untuk membuat session Supabase.
     setCalculatorAuthStatus("Mengirim OTP login...", "waiting");
 
     const {error:otpError} = await supabaseClient.auth.signInWithOtp({
@@ -5518,27 +5528,38 @@ async function calculatorVerifyOtp(){
 }
 
 async function calculatorLogout(){
-    localStorage.removeItem(CALCULATOR_SOFT_LOGIN_KEY);
-    localStorage.setItem(CALCULATOR_SOFT_LOGOUT_KEY, "1");
-    calculatorAccessUser = null;
-    calculatorPremiumActive = false;
-    calculatorPlan = "free";
-    stopCalculatorFreeCooldown();
-    calculatorFreeReady = false;
-    lockCalculator();
-    showCalculatorPanel("calculatorGuestPanel", true);
-    showCalculatorPanel("calculatorRecoveryPanel", false);
-    showCalculatorPanel("calculatorPasswordRecoveryPanel", false);
-    showCalculatorPanel("calculatorOtpPanel", false);
-    showCalculatorPanel("calculatorAccountPanel", false);
-    showCalculatorPanel("calculatorPlanPanel", false);
-    showCalculatorPanel("calculatorFreeStatus", false);
-    showCalculatorPanel("calculatorFreeCooldown", false);
-    const paymentMethod = document.getElementById("calculatorPaymentMethod");
-    if(paymentMethod) paymentMethod.value = "";
-    calculatorPaymentMethodChanged();
-    setCalculatorPaymentStatus("", "");
-    setCalculatorAuthStatus("Masukkan email terdaftar untuk masuk, atau pilih DAFTAR AKUN untuk membuat akun baru.", "");
+    try{
+        // Logout harus benar-benar menghapus session Supabase.
+        const {error} = await supabaseClient.auth.signOut();
+        if(error){
+            console.warn("Supabase logout gagal:", error.message || error);
+        }
+    }finally{
+        localStorage.removeItem(CALCULATOR_SOFT_LOGIN_KEY);
+        localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
+
+        calculatorAccessUser = null;
+        calculatorPremiumActive = false;
+        calculatorPlan = "free";
+        stopCalculatorFreeCooldown();
+        calculatorFreeReady = false;
+        lockCalculator();
+
+        showCalculatorPanel("calculatorGuestPanel", true);
+        showCalculatorPanel("calculatorRecoveryPanel", false);
+        showCalculatorPanel("calculatorPasswordRecoveryPanel", false);
+        showCalculatorPanel("calculatorOtpPanel", false);
+        showCalculatorPanel("calculatorAccountPanel", false);
+        showCalculatorPanel("calculatorPlanPanel", false);
+        showCalculatorPanel("calculatorFreeStatus", false);
+        showCalculatorPanel("calculatorFreeCooldown", false);
+
+        const paymentMethod = document.getElementById("calculatorPaymentMethod");
+        if(paymentMethod) paymentMethod.value = "";
+        calculatorPaymentMethodChanged();
+        setCalculatorPaymentStatus("", "");
+        setCalculatorAuthStatus("Masukkan email terdaftar untuk masuk, atau pilih DAFTAR AKUN untuk membuat akun baru.", "");
+    }
 }
 
 async function loadCalculatorAccess(){
@@ -5547,21 +5568,30 @@ async function loadCalculatorAccess(){
     const planPanel = document.getElementById("calculatorPlanPanel");
     if(!guest || !account) return;
 
+    // Session Supabase adalah sumber utama status login.
+    // localStorage hanya menyimpan email untuk tampilan, bukan untuk menganggap user sudah login.
     const {data:{session}} = await supabaseClient.auth.getSession();
     const sessionUser = session?.user || null;
-    const storedEmail = (localStorage.getItem(CALCULATOR_SOFT_LOGIN_KEY) || "").trim().toLowerCase();
-    const explicitlyLoggedOut = localStorage.getItem(CALCULATOR_SOFT_LOGOUT_KEY) === "1";
-    const email = storedEmail || (!explicitlyLoggedOut ? (sessionUser?.email?.toLowerCase() || "") : "");
+    const email = (sessionUser?.email || "").trim().toLowerCase();
 
-    if(!email){
+    if(!sessionUser || !email){
+        localStorage.removeItem(CALCULATOR_SOFT_LOGIN_KEY);
+        localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
         calculatorAccessUser = null;
+        calculatorPremiumActive = false;
+        calculatorPlan = "free";
         lockCalculator();
         showCalculatorPanel("calculatorGuestPanel", true);
+        showCalculatorPanel("calculatorOtpPanel", false);
         showCalculatorPanel("calculatorAccountPanel", false);
+        showCalculatorPanel("calculatorPlanPanel", false);
         setCalculatorCalculateButtonState(false);
         return;
     }
 
+    // Session masih aktif => otomatis tetap login setelah refresh / buka ulang browser.
+    localStorage.setItem(CALCULATOR_SOFT_LOGIN_KEY, email);
+    localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
     calculatorAccessUser = {email};
 
     // Jika sudah ada session/login, panel OTP harus selalu ditutup.
@@ -5740,7 +5770,7 @@ async function submitCalculatorPayment(){
     await loadCalculatorAccess();
 }
 
-supabaseClient.auth.onAuthStateChange(function(event){
+supabaseClient.auth.onAuthStateChange(function(event, session){
     setTimeout(function(){
         if(event === "PASSWORD_RECOVERY"){
             supabaseClient.auth.signOut();
@@ -5751,6 +5781,17 @@ supabaseClient.auth.onAuthStateChange(function(event){
             setCalculatorAuthStatus("Login password sudah dinonaktifkan. Gunakan login email + OTP.", "error");
             return;
         }
+
+        if(event === "SIGNED_IN" && session?.user?.email){
+            localStorage.setItem(CALCULATOR_SOFT_LOGIN_KEY, session.user.email.toLowerCase());
+            localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
+        }
+
+        if(event === "SIGNED_OUT"){
+            localStorage.removeItem(CALCULATOR_SOFT_LOGIN_KEY);
+            localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
+        }
+
         calculatorPaymentMethodChanged();
         if(document.getElementById("calculatorAccessCard")) loadCalculatorAccess();
     }, 0);
