@@ -101,6 +101,52 @@ body{
     margin-top:5px;
 }
 
+
+
+/* =========================
+JOKI ACCOUNT SCHEDULE
+========================= */
+.admin-online-card{
+    margin:0 auto 22px;
+    padding:12px 14px;
+    background:#11111c;
+    border:1px solid #35354e;
+    border-radius:13px;
+    text-align:center;
+    box-shadow:0 10px 28px rgba(0,0,0,.16);
+}
+
+.admin-online-status{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    color:#ddd;
+    font-size:13px;
+    font-weight:800;
+}
+
+.admin-online-dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#777;
+    box-shadow:0 0 0 4px rgba(119,119,119,.10);
+}
+
+
+.admin-online-label{
+    color:#777;
+    font-size:10px;
+    margin-top:4px;
+}
+
+.admin-online-hours{
+    color:#ffd900;
+    font-size:11px;
+    font-weight:700;
+    margin-top:5px;
+}
 .promo-banner-btn{
     display:inline-block;
     margin-top:10px;
@@ -4103,6 +4149,11 @@ textarea:focus{
 <div class="promo-banner-title" id="promoBannerTitle"></div>
 <div class="promo-banner-text" id="promoBannerText"></div>
 <a class="promo-banner-btn" href="#" id="promoBannerButton" rel="noopener noreferrer" target="_blank"></a>
+</div>
+<div class="admin-online-card" id="login-process-info">
+<div class="admin-online-status"><span class="admin-online-dot joki-info-dot"></span><span>PROSES JOKI AKUN</span></div>
+<div class="admin-online-label">Proses joki akun biasanya dilakukan pada jam</div>
+<div class="admin-online-hours">18:00 - 22:00 WIB</div>
 </div>
 <section aria-label="Main system modules" class="game-module-section">
 <div class="game-section-heading">
@@ -10976,6 +11027,10 @@ function initChoiceCardClickEffect(){
 
 document.addEventListener("DOMContentLoaded", initChoiceCardClickEffect);
 document.addEventListener("DOMContentLoaded", initUiFinishing);
+
+// Info jadwal proses joki akun ditampilkan sebagai pemberitahuan tetap.
+
+
 
 
 
