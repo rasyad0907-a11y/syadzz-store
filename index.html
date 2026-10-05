@@ -4340,7 +4340,7 @@ textarea:focus{
 <div class="faq-mini-bot">SYADZZ STORE</div>
                         👋 Halo! Selamat datang di <strong>SYADZZ STORE</strong>.
                         <br/><br/>
-                        Pilih salah satu dari 50 pertanyaan di bawah. Pertanyaan akan muncul seperti chat, lalu jawaban otomatis akan dikirim oleh admin bot.
+                        Pilih salah satu dari 60 pertanyaan di bawah. Pertanyaan akan muncul seperti chat, lalu jawaban otomatis akan dikirim oleh admin bot.
                     </div>
 <div class="faq-quick-wrap">
 <div class="faq-quick-label">Pilih pertanyaan</div>
@@ -4392,7 +4392,7 @@ textarea:focus{
 </div>
 </div>
 <div class="faq-search-count" id="faqSearchCount">
-<strong>56</strong> pertanyaan tersedia
+<strong>60</strong> pertanyaan tersedia
                         </div>
 <div class="faq-question-list faq-phone-question-list" id="faqQuestionList">
 <button class="faq-question-row" data-answer="Data akun digunakan untuk keperluan proses joki. Untuk keamanan tambahan, disarankan mengganti password setelah joki selesai." data-category="ACCOUNT" data-number="1" onclick="openFaqChat(this,event)" type="button">
@@ -4620,6 +4620,23 @@ textarea:focus{
 <span class="faq-number">56</span>
 <span>🔎 Langkah 5 — Bagaimana cara cek status setelah order?</span>
 </button>
+<button class="faq-question-row" data-answer="📚 TUTORIAL DAFTAR/LOGIN KALKULATOR: 1) Buka menu KALKULATOR SPEED. 2) Tekan MASUK DENGAN GOOGLE. 3) Pilih akun Google yang ingin digunakan. 4) Jika Google meminta konfirmasi, tekan Lanjutkan/Izinkan. 5) Setelah berhasil, kamu otomatis kembali ke Syadzz Store dan akun kalkulator langsung terbuka. Tidak perlu membuat password dan tidak perlu memasukkan OTP." data-category="ACCOUNT" data-number="57" onclick="openFaqChat(this,event)" type="button">
+<span class="faq-number">57</span>
+<span>🔵 Tutorial — Bagaimana cara daftar/login kalkulator dengan Google?</span>
+</button>
+<button class="faq-question-row" data-answer="🔐 TUTORIAL LOGIN KALKULATOR: 1) Buka KALKULATOR SPEED. 2) Tekan MASUK DENGAN GOOGLE. 3) Pilih Gmail yang sudah login di HP atau browser. 4) Tekan Lanjutkan jika Google meminta konfirmasi. 5) Setelah kembali ke website, akun kalkulator otomatis masuk. Jika ada beberapa akun Gmail, pilih akun yang memiliki akses Premium bila kamu sudah pernah membeli Premium dengan email tersebut." data-category="ACCOUNT" data-number="58" onclick="openFaqChat(this,event)" type="button">
+<span class="faq-number">58</span>
+<span>🔐 Tutorial lengkap — Bagaimana cara login dengan Google?</span>
+</button>
+<button class="faq-question-row" data-answer="🔵 JIKA LOGIN GOOGLE GAGAL: Pastikan koneksi internet aktif, pilih akun Google yang benar, lalu coba lagi. Jika Google menolak redirect, admin perlu memastikan Google OAuth dan URL redirect Supabase sudah dikonfigurasi dengan benar. Tidak ada kode OTP yang perlu ditunggu atau dimasukkan." data-category="ISSUE" data-number="59" onclick="openFaqChat(this,event)" type="button">
+<span class="faq-number">59</span>
+<span>🔵 Login Google gagal — Apa yang harus saya lakukan?</span>
+</button>
+<button class="faq-question-row" data-answer="🧮 SETELAH LOGIN: Pilih GRATIS untuk menggunakan akses Free sesuai batas yang tampil, atau pilih PREMIUM jika ingin akses permanen tanpa iklan dan tanpa countdown. Pada mode GRATIS, klik HITUNG untuk membuka iklan. Countdown 120 detik dimulai bersamaan dengan iklan. Setelah kembali ke halaman kalkulator, tunggu sampai countdown mencapai 0, lalu hasil perhitungan akan muncul." data-category="ACCOUNT" data-number="60" onclick="openFaqChat(this,event)" type="button">
+<span class="faq-number">60</span>
+<span>🧮 Setelah login — Bagaimana cara mulai menggunakan kalkulator?</span>
+</button>
+
 </div>
 </div>
 </div>
@@ -4640,38 +4657,26 @@ textarea:focus{
 <div class="calc-access-box">
 <div class="calc-badge">🔐 LOGIN WAJIB</div>
 <div class="calc-access-title">KALKULATOR SPEED</div>
-<div class="calc-access-subtitle">Buat akun dan login terlebih dahulu. Setelah login, pilih akses GRATIS atau PREMIUM sesuai kebutuhan kamu.</div>
-<div class="calc-price">Rp5.000 <span style="font-size:11px;color:#9696ad;font-weight:700;">/ 1 akun</span></div>
+<div class="calc-access-subtitle">Masuk menggunakan akun Google terlebih dahulu. Setelah login, pilih akses GRATIS atau PREMIUM sesuai kebutuhan kamu.</div>
+<div class="calc-price">Rp10.000 <span style="font-size:11px;color:#9696ad;font-weight:700;">/ 1 akun</span></div>
 
 <div id="calculatorGuestPanel">
 <div class="calc-auth-grid">
-<label>Email Customer</label>
-<input id="calculatorAuthEmail" type="email" autocomplete="email" placeholder="Masukkan email kamu">
-<div style="font-size:10px;color:#8c8ca4;line-height:1.5;">Masukkan email yang sudah terdaftar, lalu klik MASUK. Pendaftaran akun baru menggunakan OTP.</div>
-<div class="calc-auth-actions">
-<button class="btn btn-primary" type="button" onclick="calculatorLogin()">MASUK</button>
-<button id="calculatorRegisterBtn" class="btn btn-secondary" type="button" onclick="calculatorRegister()">DAFTAR AKUN</button>
+<div style="font-size:12px;color:#b8b8ce;line-height:1.6;margin-bottom:8px;">
+Masuk atau daftar otomatis menggunakan akun Google kamu.
 </div>
-<div id="calculatorAuthStatus" class="calc-status">Masukkan email terdaftar untuk masuk.</div>
+<div class="calc-auth-actions">
+<button id="calculatorGoogleLoginBtn" class="btn btn-primary" type="button" onclick="calculatorGoogleLogin()">
+🔵 MASUK DENGAN GOOGLE
+</button>
+</div>
+<div id="calculatorAuthStatus" class="calc-status">
+Pilih akun Google yang ingin digunakan untuk Kalkulator Speed.
+</div>
 </div>
 </div>
 
-<div id="calculatorOtpPanel" style="display:none;">
-<div class="calc-recovery-box">
-<div style="font-weight:900;font-size:13px;">📩 VERIFIKASI EMAIL</div>
-<div id="calculatorOtpInfo" style="font-size:10px;color:#8c8ca4;line-height:1.5;">Kode OTP sudah dikirim ke email kamu.</div>
-<label>Kode OTP</label>
-<input id="calculatorOtpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Masukkan kode OTP">
-<div class="calc-auth-actions">
-<button id="calculatorOtpVerifyBtn" class="btn btn-primary" type="button" onclick="calculatorVerifyOtp()">VERIFIKASI OTP</button>
-<button id="calculatorOtpResendBtn" class="btn btn-secondary" type="button" onclick="calculatorResendOtp()" disabled>KIRIM ULANG OTP (60)</button>
-<button class="btn btn-secondary" type="button" onclick="calculatorBackToAuth()">KEMBALI</button>
-</div>
-<div id="calculatorOtpStatus" class="calc-status" style="display:none;"></div>
-</div>
-</div>
-
-<div id="calculatorRecoveryPanel" style="display:none;"></div>
+<div id="calculatorRecoveryPanel" style="display:none;"></div> style="display:none;"></div>
 <div id="calculatorPasswordRecoveryPanel" style="display:none;"></div>
 
 <div id="calculatorAccountPanel" style="display:none;">
@@ -4685,11 +4690,11 @@ textarea:focus{
 <div class="calculator-plan-grid">
 <button id="calculatorFreePlanBtn" class="calculator-plan-btn" type="button" onclick="selectCalculatorPlan('free')">
 <span class="plan-title">🆓 GRATIS</span>
-<span class="plan-sub">1 kali hitung setiap 3 hari + countdown 120 detik sebelum bisa menghitung.</span>
+<span class="plan-sub">1 kali hitung setiap 2 hari • iklan + countdown 120 detik.</span>
 </button>
 <button id="calculatorPremiumPlanBtn" class="calculator-plan-btn" type="button" onclick="selectCalculatorPlan('premium')">
 <span class="plan-title">👑 PREMIUM</span>
-<span class="plan-sub">Rp5.000 sekali bayar • permanent • tanpa batas.</span>
+<span class="plan-sub">Rp10.000 sekali bayar • permanent • tanpa batas.</span>
 </button>
 </div>
 <div id="calculatorFreeStatus" class="calculator-free-status" style="display:none;margin-top:9px;">
@@ -4697,7 +4702,7 @@ textarea:focus{
 <span id="calculatorFreeCount" class="calculator-free-count">MEMERIKSA...</span>
 </div>
 <div id="calculatorFreeCooldown" class="calculator-free-cooldown" style="display:none;"></div>
-<div class="calculator-plan-note" style="margin-top:8px;">Gratis hanya bisa digunakan 1 kali setiap 3 hari. Sebelum menghitung, tunggu countdown 120 detik. Tidak ada iklan.</div>
+<div class="calculator-plan-note" style="margin-top:8px;">Gratis bisa digunakan 1 kali setiap 2 hari. Klik HITUNG untuk membuka iklan; countdown 120 detik dimulai bersamaan. Hasil muncul setelah countdown selesai.</div>
 </div>
 
 <div id="calculatorAccessGranted" style="display:none;">
@@ -4705,7 +4710,7 @@ textarea:focus{
 </div>
 
 <div id="calculatorPaymentPanel" style="display:none;">
-<div class="calc-status waiting" id="calculatorAccessState">Akun sudah login. Lakukan pembayaran Rp5.000 lalu upload bukti untuk diverifikasi admin.</div>
+<div class="calc-status waiting" id="calculatorAccessState">Akun sudah login. Lakukan pembayaran Rp10.000 lalu upload bukti untuk diverifikasi admin.</div>
 <label>Metode Pembayaran</label>
 <select id="calculatorPaymentMethod" onchange="calculatorPaymentMethodChanged()">
 <option value="">Pilih metode pembayaran</option>
@@ -4716,7 +4721,7 @@ textarea:focus{
 <div class="calc-payment-box" id="calculatorQrisBox" style="display:none;">
 <div style="font-weight:900;font-size:12px;">QRIS</div>
 <img src="qris.jpeg" alt="QRIS pembayaran kalkulator">
-<div style="font-size:10px;color:#8c8ca4;text-align:center;">Bayar tepat Rp5.000</div>
+<div style="font-size:10px;color:#8c8ca4;text-align:center;">Bayar tepat Rp10.000</div>
 </div>
 <div class="calc-payment-box" id="calculatorDanaBox" style="display:none;">
 <div style="font-weight:900;font-size:12px;">DANA</div>
@@ -4725,7 +4730,7 @@ textarea:focus{
 <div style="font-size:10px;color:#8c8ca4;margin-top:10px;">Nomor DANA</div>
 <div class="calc-pay-number">087729174391</div>
 <div style="font-size:10px;color:#8c8ca4;margin-top:12px;">Nominal</div>
-<div class="calc-pay-number">Rp5.000</div>
+<div class="calc-pay-number">Rp10.000</div>
 </div>
 </div>
 <label>Bukti Pembayaran</label>
@@ -4754,7 +4759,7 @@ textarea:focus{
 <option value="1000">Demonic Treadmill — +1K</option>
 <option value="2000">Angelic Treadmill — +2K</option>
 <option value="3000">Astral Treadmill — +3K</option>
-<option value="8500">Treadmill 8.500K — +8.500K / langkah</option>
+<option value="8500">Enchanted Forest — +8.500K / langkah</option>
 </select>
 <label>✨ Trail</label>
 <select id="trail">
@@ -4767,12 +4772,9 @@ textarea:focus{
 <option value="5">Galaksi — x5</option>
 <option value="7">Rahasia — x7</option>
 <option value="10">Abadi — x10</option>
-<option value="14">Trail Max — x14</option>
+<option value="14">Ilahi — x14</option>
 <option value="20">Bunga Bulan — x20</option>
 </select>
-<div style="margin:8px 0 12px;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-size:12px;color:#cfcfe8;">
-<strong>DATA TREADMILL:</strong> 8.500K + Trail x20 + Multi x4K ≈ <strong>34,9M / step</strong>
-</div>
 <label>🚀 Multiplier</label>
 <select id="multiplier">
 <option value="1">x1</option>
@@ -4801,7 +4803,7 @@ textarea:focus{
             Masukkan data lalu hitung.
         </div>
 </div>
-<div class="card">
+<div class="card" id="calculatorResultCard">
 <h2 class="section-title">
             📊 HASIL PERHITUNGAN
         </h2>
@@ -5166,7 +5168,9 @@ let calculatorFreeBusy = false;
 let calculatorFreeCooldownTimer = null;
 let calculatorFreeReady = false;
 const CALCULATOR_FREE_COOLDOWN_SECONDS = 120;
-const CALCULATOR_FREE_DAYS = 3;
+const CALCULATOR_FREE_DAYS = 2;
+const CALCULATOR_FREE_AD_URL = "https://bony-teaching.com/7XrmVI";
+const CALCULATOR_FREE_COOLDOWN_KEY = "syadzz_calculator_free_ad_cooldown_until";
 const CALCULATOR_SOFT_LOGIN_KEY = "syadzz_calculator_email";
 const CALCULATOR_SOFT_LOGOUT_KEY = "syadzz_calculator_logged_out";
 
@@ -5220,29 +5224,63 @@ function stopCalculatorFreeCooldown(){
     }
 }
 
-function startCalculatorFreeCooldown(seconds){
-    stopCalculatorFreeCooldown();
+function setCalculatorFreeCooldownMessage(left){
     const box = document.getElementById("calculatorFreeCooldown");
+    if(!box) return;
+    box.style.display = "block";
+    box.innerText = left > 0
+        ? "⏳ Iklan sudah dibuka. Tunggu " + left + " detik lagi sebelum hasil muncul."
+        : "✅ Countdown selesai. Hasil kalkulator siap ditampilkan.";
+}
+
+function startCalculatorFreeCooldown(seconds, onDone){
+    stopCalculatorFreeCooldown();
+
     const total = Math.max(1, Number(seconds) || CALCULATOR_FREE_COOLDOWN_SECONDS);
     const end = Date.now() + total * 1000;
-    if(box) box.style.display = "block";
-    setCalculatorCalculateButtonState(false);
+    localStorage.setItem(CALCULATOR_FREE_COOLDOWN_KEY, String(end));
 
     const tick = function(){
         const left = Math.max(0, Math.ceil((end - Date.now()) / 1000));
-        if(box){
-            box.innerText = left > 0
-                ? "⏳ Tunggu " + left + " detik sebelum tombol HITUNG SPEED bisa digunakan."
-                : "✅ Countdown selesai. Sekarang kamu bisa klik HITUNG SPEED.";
-        }
+        setCalculatorFreeCooldownMessage(left);
+
         if(left <= 0){
             stopCalculatorFreeCooldown();
-            setCalculatorCalculateButtonState(true);
+            localStorage.removeItem(CALCULATOR_FREE_COOLDOWN_KEY);
+            if(typeof onDone === "function") onDone();
         }
     };
+
     tick();
     calculatorFreeCooldownTimer = setInterval(tick, 1000);
 }
+
+function restoreCalculatorFreeAdCooldown(){
+    if(calculatorPremiumActive) return;
+
+    const storedEnd = Number(localStorage.getItem(CALCULATOR_FREE_COOLDOWN_KEY) || 0);
+    if(!storedEnd) return;
+
+    const left = Math.max(0, Math.ceil((storedEnd - Date.now()) / 1000));
+    const resultCard = document.getElementById("calculatorResultCard");
+
+    if(left > 0){
+        if(resultCard) resultCard.style.display = "none";
+        calculatorFreeBusy = true;
+        setCalculatorCalculateButtonState(false);
+        startCalculatorFreeCooldown(left, function(){
+            if(resultCard) resultCard.style.display = "";
+            calculatorFreeBusy = false;
+            setCalculatorCalculateButtonState(false);
+        });
+    }else{
+        localStorage.removeItem(CALCULATOR_FREE_COOLDOWN_KEY);
+    }
+}
+
+document.addEventListener("visibilitychange", function(){
+    if(!document.hidden) restoreCalculatorFreeAdCooldown();
+});
 
 async function getCalculatorFreeAccess(){
     try{
@@ -5264,21 +5302,36 @@ async function getCalculatorFreeAccess(){
 
 async function refreshCalculatorFreeStatus(){
     if(!calculatorAccessUser || calculatorPremiumActive) return;
+
     const result = await getCalculatorFreeAccess();
+
     if(result.ok !== false){
         const available = result.available === true;
-        setCalculatorFreeStatus(available, available ? "1 KALI / 3 HARI" : "TERPAKAI");
+
+        setCalculatorFreeStatus(
+            available,
+            available ? "1 KALI / 2 HARI" : "TERPAKAI"
+        );
+
         if(available){
-            startCalculatorFreeCooldown(CALCULATOR_FREE_COOLDOWN_SECONDS);
+            stopCalculatorFreeCooldown();
+            setCalculatorCalculateButtonState(true);
+
+            const box = document.getElementById("calculatorFreeCooldown");
+            if(box){
+                box.style.display = "block";
+                box.innerText = "📢 Klik HITUNG untuk membuka iklan. Countdown 120 detik dimulai setelah iklan terbuka.";
+            }
         }else{
             stopCalculatorFreeCooldown();
             setCalculatorCalculateButtonState(false);
+
             const box = document.getElementById("calculatorFreeCooldown");
             if(box){
                 box.style.display = "block";
                 box.innerText = result.next_available_at
                     ? "⏳ Jatah gratis berikutnya tersedia " + new Date(result.next_available_at).toLocaleString("id-ID", {timeZone:"Asia/Jakarta"}) + "."
-                    : "❌ Jatah gratis sedang digunakan. Bisa dipakai lagi setelah 3 hari.";
+                    : "❌ Jatah gratis sudah digunakan. Bisa dipakai lagi setelah 2 hari.";
             }
         }
     }else{
@@ -5338,263 +5391,56 @@ function showCalculatorPanel(id, show){
     if(el) el.style.display = show ? "block" : "none";
 }
 
-let calculatorAuthMode = "login";
-let calculatorOtpEmail = "";
-let calculatorOtpBusy = false;
-let calculatorOtpCooldownUntil = 0;
-let calculatorOtpCooldownTimer = null;
-
-function setCalculatorOtpStatus(message, type){
-    const el = document.getElementById("calculatorOtpStatus");
-    if(!el) return;
-    el.style.display = message ? "block" : "none";
-    el.className = "calc-status" + (type ? " " + type : "");
-    el.innerText = message || "";
-}
-
-function startCalculatorOtpCooldown(seconds){
-    const total = Math.max(1, Number(seconds) || 60);
-    calculatorOtpCooldownUntil = Date.now() + total * 1000;
-    if(calculatorOtpCooldownTimer) clearInterval(calculatorOtpCooldownTimer);
-
-    const tick = () => {
-        const left = Math.max(0, Math.ceil((calculatorOtpCooldownUntil - Date.now()) / 1000));
-        const resendBtn = document.getElementById("calculatorOtpResendBtn");
-        const otpInfo = document.getElementById("calculatorOtpInfo");
-
-        if(resendBtn){
-            resendBtn.disabled = left > 0;
-            resendBtn.textContent = left > 0
-                ? `KIRIM ULANG OTP (${left})`
-                : "KIRIM ULANG OTP";
-        }
-
-        if(otpInfo && calculatorOtpEmail){
-            otpInfo.innerText = left > 0
-                ? `Kode OTP pendaftaran sudah dikirim ke ${calculatorOtpEmail}. Kode baru bisa diminta lagi setelah ${left} detik.`
-                : `Belum menerima OTP? Kamu bisa meminta kode baru sekarang.`;
-        }
-
-        if(left <= 0){
-            clearInterval(calculatorOtpCooldownTimer);
-            calculatorOtpCooldownTimer = null;
-        }
-    };
-
-    tick();
-    calculatorOtpCooldownTimer = setInterval(tick, 1000);
-}
-
-function getOtpWaitSeconds(message){
-    const text = String(message || "");
-    const match = text.match(/(?:after|dalam|in)\s+(\d+)\s*seconds?/i);
-    return match ? Number(match[1]) : 60;
-}
-
-function calculatorOpenOtpPanel(mode, email){
-    calculatorAuthMode = mode;
-    calculatorOtpEmail = email;
-    const info = document.getElementById("calculatorOtpInfo");
-    if(info){
-        info.innerText = mode === "register"
-            ? `Kode OTP pendaftaran sudah dikirim ke ${email}.`
-            : `Kode OTP sudah dikirim ke ${email}.`;
-    }
-    const resendBtn = document.getElementById("calculatorOtpResendBtn");
-    if(resendBtn){
-        resendBtn.disabled = true;
-        resendBtn.textContent = "KIRIM ULANG OTP (60)";
-    }
-    const code = document.getElementById("calculatorOtpCode");
-    if(code) code.value = "";
-    showCalculatorPanel("calculatorGuestPanel", false);
-    showCalculatorPanel("calculatorOtpPanel", true);
-    setCalculatorOtpStatus("Masukkan kode OTP dari email kamu (ikuti jumlah digit yang dikirim).", "waiting");
-}
-
-function calculatorBackToAuth(){
-    showCalculatorPanel("calculatorOtpPanel", false);
-    showCalculatorPanel("calculatorGuestPanel", true);
-    setCalculatorOtpStatus("", "");
-    calculatorOtpEmail = "";
-    calculatorAuthMode = "login";
-}
-
-async function calculatorLogin(){
-    const email = (document.getElementById("calculatorAuthEmail")?.value || "").trim().toLowerCase();
-    if(!email){
-        setCalculatorAuthStatus("Masukkan email terlebih dahulu.", "error");
-        return;
-    }
-
-    // Kalau session Supabase masih aktif, jangan kirim OTP lagi.
-    const {data:{session}} = await supabaseClient.auth.getSession();
-    if(session?.user?.email){
-        const activeEmail = session.user.email.toLowerCase();
-        localStorage.setItem(CALCULATOR_SOFT_LOGIN_KEY, activeEmail);
-        localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
-        calculatorAccessUser = {email:activeEmail};
-        await loadCalculatorAccess();
-        return;
-    }
-
-    setCalculatorAuthStatus("Mengecek email...", "waiting");
-
-    // Pastikan email memang sudah terdaftar.
-    const {data:registered, error:registeredError} = await supabaseClient.rpc("is_calculator_email_registered_v1", {
-        p_email: email
-    });
-
-    if(registeredError){
-        setCalculatorAuthStatus("Gagal mengecek email: " + (registeredError.message || "Error"), "error");
-        return;
-    }
-
-    if(registered !== true){
-        setCalculatorAuthStatus("Maaf, email anda belum terdaftar. Silakan buat akun terlebih dahulu.", "error");
-        return;
-    }
-
-    // Login pertama kali membutuhkan OTP untuk membuat session Supabase.
-    setCalculatorAuthStatus("Mengirim OTP login...", "waiting");
-
-    const {error:otpError} = await supabaseClient.auth.signInWithOtp({
-        email,
-        options:{
-            shouldCreateUser:false
-        }
-    });
-
-    if(otpError){
-        const msg = otpError.message || "Error";
-        const wait = getOtpWaitSeconds(msg);
-        if(/rate.?limit|too many requests|only request this after|after \d+ seconds|\d+ seconds/i.test(msg)){
-            startCalculatorOtpCooldown(wait);
-        }
-        setCalculatorAuthStatus("Gagal mengirim OTP: " + msg, "error");
-        return;
-    }
-
-    calculatorOpenOtpPanel("login", email);
-    startCalculatorOtpCooldown(60);
-    setCalculatorOtpStatus("✅ OTP login sudah dikirim. Gunakan kode TERBARU dari email dan masukkan semua digitnya.", "success");
-}
-
-function calculatorRegister(){
-    window.location.href = "daftar.html?from=calculator";
-}
-
-async function calculatorResendOtp(){
-    if(calculatorOtpBusy) return;
-
-    const email = calculatorOtpEmail || (document.getElementById("calculatorAuthEmail")?.value || "").trim().toLowerCase();
-    if(!email){
-        setCalculatorOtpStatus("Email OTP tidak ditemukan. Kembali lalu masukkan email lagi.", "error");
-        return;
-    }
-
-    const remaining = Math.max(0, Math.ceil((calculatorOtpCooldownUntil - Date.now()) / 1000));
-    if(remaining > 0){
-        startCalculatorOtpCooldown(remaining);
-        setCalculatorOtpStatus(`Tunggu ${remaining} detik sebelum meminta OTP baru.`, "waiting");
-        return;
-    }
-
-    calculatorOtpBusy = true;
-    const btn = document.getElementById("calculatorOtpResendBtn");
+async function calculatorGoogleLogin(){
+    const btn = document.getElementById("calculatorGoogleLoginBtn");
     if(btn){
         btn.disabled = true;
-        btn.textContent = "MENGIRIM...";
+        btn.textContent = "MEMBUKA GOOGLE...";
     }
-    setCalculatorOtpStatus("Mengirim OTP baru...", "waiting");
+
+    setCalculatorAuthStatus("Membuka pilihan akun Google...", "waiting");
 
     try{
-        const {error} = await supabaseClient.auth.signInWithOtp({
-            email,
-            options:{shouldCreateUser:false}
+        const redirectTo = window.location.origin + window.location.pathname;
+
+        const {data, error} = await supabaseClient.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+                redirectTo,
+                queryParams: {
+                    prompt: "select_account"
+                }
+            }
         });
 
         if(error){
-            const msg = error.message || "Error";
-            const wait = getOtpWaitSeconds(msg);
-            if(/rate.?limit|too many requests|only request this after|after \d+ seconds|\d+ seconds/i.test(msg)){
-                startCalculatorOtpCooldown(wait);
-                setCalculatorOtpStatus(`Supabase masih membatasi pengiriman OTP. Tunggu ${wait} detik lalu coba lagi.`, "error");
-            }else{
-                setCalculatorOtpStatus("Gagal mengirim OTP baru: " + msg, "error");
+            setCalculatorAuthStatus("Login Google gagal: " + (error.message || "Error"), "error");
+            if(btn){
+                btn.disabled = false;
+                btn.textContent = "🔵 MASUK DENGAN GOOGLE";
             }
             return;
         }
 
-        startCalculatorOtpCooldown(60);
-        setCalculatorOtpStatus("✅ OTP baru sudah dikirim. Cek inbox/spam email kamu.", "success");
-    }finally{
-        calculatorOtpBusy = false;
-    }
-}
-
-async function calculatorVerifyOtp(){
-    if(calculatorOtpBusy) return;
-    const email = calculatorOtpEmail || (document.getElementById("calculatorAuthEmail")?.value || "").trim().toLowerCase();
-    const token = (document.getElementById("calculatorOtpCode")?.value || "").replace(/\D/g, "").slice(0,8);
-
-    if(!email){
-        setCalculatorOtpStatus("Email OTP tidak ditemukan. Kembali lalu masukkan email lagi.", "error");
-        return;
-    }
-    if(![6,8].includes(token.length)){
-        setCalculatorOtpStatus("Masukkan kode OTP lengkap dari email (6 atau 8 digit).", "error");
-        return;
-    }
-
-    calculatorOtpBusy = true;
-    const btn = document.getElementById("calculatorOtpVerifyBtn");
-    if(btn){
-        btn.disabled = true;
-        btn.textContent = "MEMVERIFIKASI...";
-    }
-    setCalculatorOtpStatus("Memverifikasi OTP...", "waiting");
-
-    try{
-        const {data, error} = await supabaseClient.auth.verifyOtp({
-            email,
-            token,
-            type:"email"
-        });
-
-        if(error){
-            setCalculatorOtpStatus("OTP tidak valid atau sudah kedaluwarsa: " + (error.message || "Error"), "error");
-            return;
+        if(!data?.url){
+            setCalculatorAuthStatus("URL login Google tidak tersedia. Coba lagi.", "error");
+            if(btn){
+                btn.disabled = false;
+                btn.textContent = "🔵 MASUK DENGAN GOOGLE";
+            }
         }
-
-        if(!data?.session){
-            setCalculatorOtpStatus("OTP berhasil diverifikasi, tetapi sesi login belum tersedia. Coba login kembali.", "error");
-            return;
-        }
-
-        calculatorOtpEmail = "";
-        calculatorOtpCooldownUntil = 0;
-        // Setelah OTP berhasil, tutup panel OTP tanpa perlu refresh.
-        showCalculatorPanel("calculatorOtpPanel", false);
-        setCalculatorOtpStatus("", "");
-        localStorage.setItem(CALCULATOR_SOFT_LOGIN_KEY, email);
-        localStorage.removeItem(CALCULATOR_SOFT_LOGOUT_KEY);
-        if(calculatorOtpCooldownTimer){
-            clearInterval(calculatorOtpCooldownTimer);
-            calculatorOtpCooldownTimer = null;
-        }
-        setCalculatorOtpStatus("✅ OTP benar. Login berhasil.", "success");
-        await loadCalculatorAccess();
-    }finally{
-        calculatorOtpBusy = false;
+    }catch(error){
+        console.error("Google OAuth error:", error);
+        setCalculatorAuthStatus("Login Google gagal: " + (error?.message || "Error"), "error");
         if(btn){
             btn.disabled = false;
-            btn.textContent = "VERIFIKASI OTP";
+            btn.textContent = "🔵 MASUK DENGAN GOOGLE";
         }
     }
 }
 
 async function calculatorLogout(){
+
     try{
         // Logout harus benar-benar menghapus session Supabase.
         const {error} = await supabaseClient.auth.signOut();
@@ -5615,7 +5461,6 @@ async function calculatorLogout(){
         showCalculatorPanel("calculatorGuestPanel", true);
         showCalculatorPanel("calculatorRecoveryPanel", false);
         showCalculatorPanel("calculatorPasswordRecoveryPanel", false);
-        showCalculatorPanel("calculatorOtpPanel", false);
         showCalculatorPanel("calculatorAccountPanel", false);
         showCalculatorPanel("calculatorPlanPanel", false);
         showCalculatorPanel("calculatorFreeStatus", false);
@@ -5625,7 +5470,7 @@ async function calculatorLogout(){
         if(paymentMethod) paymentMethod.value = "";
         calculatorPaymentMethodChanged();
         setCalculatorPaymentStatus("", "");
-        setCalculatorAuthStatus("Masukkan email terdaftar untuk masuk, atau pilih DAFTAR AKUN untuk membuat akun baru.", "");
+        setCalculatorAuthStatus("Pilih akun Google untuk masuk kembali ke Kalkulator Speed.", "");
     }
 }
 
@@ -5649,7 +5494,6 @@ async function loadCalculatorAccess(){
         calculatorPlan = "free";
         lockCalculator();
         showCalculatorPanel("calculatorGuestPanel", true);
-        showCalculatorPanel("calculatorOtpPanel", false);
         showCalculatorPanel("calculatorAccountPanel", false);
         showCalculatorPanel("calculatorPlanPanel", false);
         setCalculatorCalculateButtonState(false);
@@ -5670,12 +5514,12 @@ async function loadCalculatorAccess(){
     const emailEl = document.getElementById("calculatorAccountEmail");
     if(emailEl) emailEl.innerText = email;
 
+    // Cek Premium berdasarkan email akun.
+    // Ini menjaga Premium lama tetap terbaca ketika user beralih dari OTP ke Google.
     let data, error;
-    if(sessionUser && sessionUser.email?.toLowerCase() === email){
-        ({data, error} = await supabaseClient.rpc("get_calculator_access_v1"));
-    }else{
-        ({data, error} = await supabaseClient.rpc("get_calculator_access_by_email_v1", {p_email: email}));
-    }
+    ({data, error} = await supabaseClient.rpc("get_calculator_access_by_email_v1", {
+        p_email: email
+    }));
     if(error){
         calculatorPremiumActive = false;
         calculatorPlan = "free";
@@ -5718,7 +5562,7 @@ async function loadCalculatorAccess(){
         const state = document.getElementById("calculatorAccessState");
         if(state){
             state.className = "calc-status waiting";
-            state.innerText = "⏳ Pembayaran Rp5.000 sedang menunggu verifikasi admin. Mode Gratis tetap bisa dipakai 1 kali setiap 3 hari.";
+            state.innerText = "⏳ Pembayaran Rp10.000 sedang menunggu verifikasi admin. Mode Gratis tetap bisa dipakai 1 kali setiap 2 hari.";
         }
         setCalculatorPaymentStatus("Bukti sudah diterima. Tunggu verifikasi admin untuk membuka Premium.", "waiting");
     }else if(status === "rejected"){
@@ -5776,7 +5620,10 @@ async function submitCalculatorPayment(){
     setCalculatorPaymentStatus("Memeriksa status Premium...", "waiting");
     let currentAccess = null;
     try{
-        const {data, error} = await supabaseClient.rpc("get_calculator_access_v1");
+        const email = (user.email || "").trim().toLowerCase();
+        const {data, error} = await supabaseClient.rpc("get_calculator_access_by_email_v1", {
+            p_email: email
+        });
         if(!error){
             currentAccess = Array.isArray(data) ? data[0] : data;
         }
@@ -5843,9 +5690,8 @@ supabaseClient.auth.onAuthStateChange(function(event, session){
             supabaseClient.auth.signOut();
             lockCalculator();
             showCalculatorPanel("calculatorGuestPanel", true);
-            showCalculatorPanel("calculatorOtpPanel", false);
             showCalculatorPanel("calculatorAccountPanel", false);
-            setCalculatorAuthStatus("Login password sudah dinonaktifkan. Gunakan login email + OTP.", "error");
+            setCalculatorAuthStatus("Login password tidak digunakan. Gunakan tombol Masuk dengan Google.", "error");
             return;
         }
 
@@ -8968,219 +8814,136 @@ async function hitung(){
         return;
     }
 
-    if(calculatorPremiumActive){
-        setCalculatorCalculateButtonState(true);
-    }else{
-        calculatorPlan = "free";
-        setCalculatorPlanButtons();
+    const status = document.getElementById("dataStatus");
 
-        if(!calculatorFreeReady){
-            const status = document.getElementById("dataStatus");
-            if(status) status.innerText = "⏳ Tunggu countdown 120 detik sebelum klik HITUNG SPEED.";
-            return;
-        }
-
-        if(calculatorFreeBusy){
-            return;
-        }
-
-        calculatorFreeBusy = true;
-        const status = document.getElementById("dataStatus");
-        if(status) status.innerText = "🔎 Mengecek jatah gratis...";
-
-        const result = await getCalculatorFreeAccessConsume();
-        if(!result.ok || result.allowed !== true){
-            calculatorFreeBusy = false;
-            setCalculatorCalculateButtonState(false);
-            stopCalculatorFreeCooldown();
-            const box = document.getElementById("calculatorFreeCooldown");
-            if(box){
-                box.style.display = "block";
-                box.innerText = result.message || "❌ Jatah gratis hanya bisa digunakan setiap 3 hari.";
-            }
-            if(status) status.innerText = result.message || "❌ Jatah gratis hanya bisa digunakan setiap 3 hari.";
-            setCalculatorFreeStatus(false, "TERPAKAI");
-            return;
-        }
-
-        const box = document.getElementById("calculatorFreeCooldown");
-        if(box) box.innerText = "✅ Akses gratis berhasil digunakan. Silakan lihat hasil di bawah.";
-        setCalculatorFreeStatus(false, "TERPAKAI 3 HARI");
-        calculatorFreeReady = false;
-        setCalculatorCalculateButtonState(false);
-        calculatorFreeBusy = false;
-    }
-
-    const treadmill =
-        Number(
-            document.getElementById(
-                "treadmill"
-            ).value
-        );
-
-
-    const trail =
-        Number(
-            document.getElementById(
-                "trail"
-            ).value
-        );
-
-
-    const multiplier =
-        Number(
-            document.getElementById(
-                "multiplier"
-            ).value
-        );
-
-
-    const currentSpeed =
-        parseSpeed(
-            document.getElementById(
-                "currentSpeed"
-            ).value
-        );
-
-
-    const hours =
-        Number(
-            document.getElementById(
-                "hours"
-            ).value
-        );
-
-
-    const status =
-        document.getElementById(
-            "dataStatus"
-        );
-
-
-    if(
-        !Number.isFinite(
-            currentSpeed
-        ) ||
-        currentSpeed < 0
-    ){
-
-        status.innerText =
-            "Speed sekarang tidak valid.";
-
+    if(calculatorFreeBusy){
         return;
-
     }
 
+    const treadmill = Number(document.getElementById("treadmill").value);
+    const trail = Number(document.getElementById("trail").value);
+    const multiplier = Number(document.getElementById("multiplier").value);
+    const currentSpeed = parseSpeed(document.getElementById("currentSpeed").value);
+    const hours = Number(document.getElementById("hours").value);
 
-    if(
-        !Number.isFinite(hours) ||
-        hours < 0
-    ){
-
-        status.innerText =
-            "Waktu AFK tidak valid.";
-
+    if(!Number.isFinite(currentSpeed) || currentSpeed < 0){
+        if(status) status.innerText = "Speed sekarang tidak valid.";
         return;
-
     }
 
+    if(!Number.isFinite(hours) || hours < 0){
+        if(status) status.innerText = "Waktu AFK tidak valid.";
+        return;
+    }
 
     const STEPS_PER_SECOND = 22;
 
-
     const gainPerStep =
         treadmill *
-        (
-            trail +
-            multiplier -
-            1
-        );
+        (trail + multiplier - 1);
 
+    const gainPerSecond = gainPerStep * STEPS_PER_SECOND;
+    const gainPerMinute = gainPerSecond * 60;
+    const gainPerHour = gainPerSecond * 3600;
+    const gainFromAFK = gainPerHour * hours;
+    const totalAfterAFK = currentSpeed + gainFromAFK;
 
-    const gainPerSecond =
-        gainPerStep *
-        STEPS_PER_SECOND;
+    function renderCalculatorResult(){
+        document.getElementById("resultCurrentSpeed").innerText = formatNumber(currentSpeed);
+        document.getElementById("resultGainStep").innerText = formatNumber(gainPerStep);
+        document.getElementById("resultGainSecond").innerText = formatNumber(gainPerSecond);
+        document.getElementById("resultGainMinute").innerText = formatNumber(gainPerMinute);
+        document.getElementById("resultGainHour").innerText = formatNumber(gainPerHour);
+        document.getElementById("resultAFK").innerText = formatNumber(gainFromAFK);
+        document.getElementById("resultTotal").innerText = formatNumber(totalAfterAFK);
 
+        if(status) status.innerText = "Perhitungan berhasil.";
+    }
 
-    const gainPerMinute =
-        gainPerSecond * 60;
+    // Premium tetap langsung mendapatkan hasil tanpa iklan/countdown.
+    if(calculatorPremiumActive){
+        calculatorPlan = "premium";
+        setCalculatorPlanButtons();
+        setCalculatorCalculateButtonState(true);
+        renderCalculatorResult();
+        return;
+    }
 
+    calculatorPlan = "free";
+    setCalculatorPlanButtons();
 
-    const gainPerHour =
-        gainPerSecond * 3600;
+    // Free harus tersedia sebelum membuka iklan.
+    if(!calculatorFreeReady){
+        if(status) status.innerText = "⏳ Jatah Free belum tersedia. Tunggu sampai 2 hari berikutnya.";
+        return;
+    }
 
+    calculatorFreeBusy = true;
+    setCalculatorCalculateButtonState(false);
 
-    const gainFromAFK =
-        gainPerHour *
-        hours;
+    if(status) status.innerText = "📢 Membuka iklan...";
 
+    // Iklan dibuka oleh aksi klik HITUNG user.
+    const adWindow = window.open(
+        CALCULATOR_FREE_AD_URL,
+        "_blank",
+        "noopener,noreferrer"
+    );
 
-    const totalAfterAFK =
-        currentSpeed +
-        gainFromAFK;
+    if(!adWindow){
+        calculatorFreeBusy = false;
+        setCalculatorCalculateButtonState(true);
+        if(status){
+            status.innerText = "⚠️ Iklan tidak terbuka. Izinkan pop-up untuk Syadzz Store lalu klik HITUNG lagi.";
+        }
+        return;
+    }
 
+    // Consume kuota hanya setelah iklan berhasil dibuka.
+    const result = await getCalculatorFreeAccessConsume();
 
-    document.getElementById(
-        "resultCurrentSpeed"
-    ).innerText =
-        formatNumber(
-            currentSpeed
-        );
+    if(!result.ok || result.allowed !== true){
+        calculatorFreeBusy = false;
+        setCalculatorCalculateButtonState(false);
 
+        try{
+            adWindow.close();
+        }catch(_){}
 
-    document.getElementById(
-        "resultGainStep"
-    ).innerText =
-        formatNumber(
-            gainPerStep
-        );
+        const box = document.getElementById("calculatorFreeCooldown");
+        if(box){
+            box.style.display = "block";
+            box.innerText = result.message || "❌ Jatah gratis hanya bisa digunakan 1 kali setiap 2 hari.";
+        }
 
+        if(status) status.innerText = result.message || "❌ Jatah gratis hanya bisa digunakan 1 kali setiap 2 hari.";
+        setCalculatorFreeStatus(false, "TERPAKAI");
+        return;
+    }
 
-    document.getElementById(
-        "resultGainSecond"
-    ).innerText =
-        formatNumber(
-            gainPerSecond
-        );
+    // Simpan hasil di halaman, tetapi sembunyikan sampai countdown selesai.
+    renderCalculatorResult();
 
+    const resultCard = document.getElementById("calculatorResultCard");
+    if(resultCard) resultCard.style.display = "none";
 
-    document.getElementById(
-        "resultGainMinute"
-    ).innerText =
-        formatNumber(
-            gainPerMinute
-        );
+    setCalculatorFreeStatus(false, "TERPAKAI 2 HARI");
 
+    const box = document.getElementById("calculatorFreeCooldown");
+    if(box){
+        box.style.display = "block";
+        box.innerText = "📢 Iklan terbuka. Countdown 120 detik sedang berjalan...";
+    }
 
-    document.getElementById(
-        "resultGainHour"
-    ).innerText =
-        formatNumber(
-            gainPerHour
-        );
+    if(status) status.innerText = "⏳ Iklan sudah dibuka. Hasil akan muncul setelah countdown 120 detik.";
 
-
-    document.getElementById(
-        "resultAFK"
-    ).innerText =
-        formatNumber(
-            gainFromAFK
-        );
-
-
-    document.getElementById(
-        "resultTotal"
-    ).innerText =
-        formatNumber(
-            totalAfterAFK
-        );
-
-
-    status.innerText =
-        "Perhitungan berhasil.";
-
+    startCalculatorFreeCooldown(CALCULATOR_FREE_COOLDOWN_SECONDS, function(){
+        if(resultCard) resultCard.style.display = "";
+        if(status) status.innerText = "✅ Countdown selesai. Hasil kalkulator sudah tersedia.";
+        calculatorFreeBusy = false;
+        setCalculatorCalculateButtonState(false);
+    });
 }
-
 
 function changePayment(){
 
