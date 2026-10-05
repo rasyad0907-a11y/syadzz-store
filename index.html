@@ -8897,20 +8897,33 @@ async function hitung(){
 // Menghitung dan menampilkan hasil tanpa melewati logika Free/Premium.
 async function runCalculatorNow(){
     const status = document.getElementById("dataStatus");
+    const treadmillEl = document.getElementById("treadmill");
+    const trailEl = document.getElementById("trail");
+    const multiplierEl = document.getElementById("multiplier");
+    const speedEl = document.getElementById("currentSpeed");
+    const hoursEl = document.getElementById("hours");
 
-    const treadmill = Number(document.getElementById("treadmill").value);
-    const trail = Number(document.getElementById("trail").value);
-    const multiplier = Number(document.getElementById("multiplier").value);
-    const currentSpeed = parseSpeed(document.getElementById("currentSpeed").value);
-    const hours = Number(document.getElementById("hours").value);
-
-    if(!Number.isFinite(currentSpeed) || currentSpeed < 0){
-        if(status) status.innerText = "Speed sekarang tidak valid.";
-        throw new Error("Speed sekarang tidak valid.");
+    if(!treadmillEl || !trailEl || !multiplierEl || !speedEl || !hoursEl){
+        if(status) status.innerText = "❌ Form kalkulator tidak lengkap. Refresh halaman lalu coba lagi.";
+        throw new Error("Elemen form kalkulator tidak lengkap.");
     }
 
+    const treadmill = Number.parseFloat(treadmillEl.value);
+    const trail = Number.parseFloat(trailEl.value);
+    const multiplier = Number.parseFloat(multiplierEl.value);
+    const currentSpeed = parseSpeed(speedEl.value);
+    const hours = Number.parseFloat(hoursEl.value);
+
+    if(!Number.isFinite(treadmill) || treadmill <= 0 || !Number.isFinite(trail) || trail <= 0 || !Number.isFinite(multiplier) || multiplier <= 0){
+        if(status) status.innerText = "❌ Treadmill, Trail, atau Multiplier tidak valid.";
+        throw new Error("Input pilihan kalkulator tidak valid.");
+    }
+    if(!Number.isFinite(currentSpeed) || currentSpeed < 0){
+        if(status) status.innerText = "❌ Speed sekarang tidak valid. Contoh: 10K, 2.5M, atau 1B.";
+        throw new Error("Speed sekarang tidak valid.");
+    }
     if(!Number.isFinite(hours) || hours < 0){
-        if(status) status.innerText = "Waktu AFK tidak valid.";
+        if(status) status.innerText = "❌ Waktu AFK tidak valid.";
         throw new Error("Waktu AFK tidak valid.");
     }
 
@@ -8922,15 +8935,23 @@ async function runCalculatorNow(){
     const gainFromAFK = gainPerHour * hours;
     const totalAfterAFK = currentSpeed + gainFromAFK;
 
-    document.getElementById("resultCurrentSpeed").innerText = formatNumber(currentSpeed);
-    document.getElementById("resultGainStep").innerText = formatNumber(gainPerStep);
-    document.getElementById("resultGainSecond").innerText = formatNumber(gainPerSecond);
-    document.getElementById("resultGainMinute").innerText = formatNumber(gainPerMinute);
-    document.getElementById("resultGainHour").innerText = formatNumber(gainPerHour);
-    document.getElementById("resultAFK").innerText = formatNumber(gainFromAFK);
-    document.getElementById("resultTotal").innerText = formatNumber(totalAfterAFK);
+    const resultMap = {
+        resultCurrentSpeed: currentSpeed,
+        resultGainStep: gainPerStep,
+        resultGainSecond: gainPerSecond,
+        resultGainMinute: gainPerMinute,
+        resultGainHour: gainPerHour,
+        resultAFK: gainFromAFK,
+        resultTotal: totalAfterAFK
+    };
 
-    if(status) status.innerText = "Perhitungan berhasil.";
+    Object.entries(resultMap).forEach(function([id,value]){
+        const el = document.getElementById(id);
+        if(el) el.innerText = formatNumber(value);
+    });
+
+    if(status) status.innerText = "✅ Perhitungan berhasil. Hasil sudah dihitung dari input yang kamu pilih.";
+    return resultMap;
 }
 
 function changePayment(){
