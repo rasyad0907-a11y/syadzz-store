@@ -11206,10 +11206,6 @@ function topupCalculatePrice(amount){
     if(!Number.isInteger(amount) || amount<50){
         return {ok:false,message:"Minimal pembelian adalah 50 Robux."};
     }
-    if(amount>Number(robuxStoreSettings.stock_robux||0)){
-        return {ok:false,message:"Jumlah Robux melebihi stok yang tersedia."};
-    }
-
     const rows=topupGetPriceRows();
     if(!rows.length){
         return {ok:false,message:"Daftar harga Robux belum berhasil dimuat."};
@@ -11286,12 +11282,19 @@ function topupAmountChanged(){
     const total=document.getElementById("topupTotalValue");
     const amount=Number(input?.value||0);
     const result=topupCalculatePrice(amount);
+    const stock=Number(robuxStoreSettings.stock_robux||0);
     if(!result.ok){
         if(msg) msg.innerText=result.message;
         if(total) total.innerText="0 RBX · Rp0";
+        topupUpdateButton();
         return;
     }
-    if(msg) msg.innerText=result.parts?.length ? "Patokan harga: "+result.parts.join(" + ") : "";
+    if(msg){
+        msg.innerText=result.parts?.length ? "Patokan harga: "+result.parts.join(" + ") : "";
+        if(stock>0 && amount>stock){
+            msg.innerText="Jumlah melebihi stok tersedia ("+stock.toLocaleString("id-ID")+" RBX).";
+        }
+    }
     if(total) total.innerText=amount.toLocaleString("id-ID")+" RBX · "+rupiahTopup(result.total);
     document.querySelectorAll(".topup-price-table tbody tr").forEach(function(row){
         row.classList.remove("active");
@@ -11339,7 +11342,8 @@ function topupUpdateButton(){
     if(!btn) return;
     topupUsernameChanged();
     const amount=Number(document.getElementById("topupRobuxAmount")?.value||0);
-    const validAmount=topupCalculatePrice(amount).ok;
+    const stock=Number(robuxStoreSettings.stock_robux||0);
+    const validAmount=topupCalculatePrice(amount).ok && amount<=stock;
     const username=(document.getElementById("topupRobloxUsername")?.value||"").trim();
     const validUsername=/^@[A-Za-z0-9_]{3,20}$/.test(username);
     const wa=(document.getElementById("topupCustomerWA")?.value||"").trim();
@@ -11347,7 +11351,6 @@ function topupUpdateButton(){
     const proof=!!document.getElementById("topupProofFile")?.files?.[0];
     const confirmed=document.getElementById("topupAgeConfirm")?.checked===true;
     const active=robuxStoreSettings.active===true;
-    const stock=Number(robuxStoreSettings.stock_robux||0);
     btn.disabled=!(active && stock>0 && validAmount && validUsername && wa && payment && proof && confirmed);
 }
 
@@ -11355,24 +11358,32 @@ async function loadRobuxStore(){
     if(robuxStoreLoading) return;
     robuxStoreLoading=true;
     try{
-        // Database saat ini: get_robux_store_v1() -> TABLE(active boolean, stock bigint).
-        const {data,error}=await supabaseClient.rpc("get_robux_store_v1");
+        // Gunakan RPC publik baru yang kompatibel dengan database saat ini.
+        // Tidak mengubah / menghapus function get_robux_store_v1() lama.
+        const request=supabaseClient.rpc("get_robux_store_public_v2");
+        const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error("Timeout memuat data Top Up Robux.")),10000));
+        const {data,error}=await Promise.race([request,timeout]);
         if(error) throw error;
 
-        const result=Array.isArray(data) ? data[0] : data;
+        const payload=typeof data === "string" ? JSON.parse(data) : (data || {});
+        const settings=payload.settings || {};
+        const prices=Array.isArray(payload.prices) ? payload.prices : [];
+
         robuxStoreSettings={
-            active:result?.active===true,
-            stock_robux:Number(result?.stock||0)
+            active:settings.active===true,
+            stock_robux:Number(settings.stock_robux ?? settings.stock ?? 0)
         };
 
         // Database saat ini: robux_prices(robux_amount integer, price bigint).
-        const {data:prices,error:priceError}=await supabaseClient
-            .from("robux_prices")
-            .select("robux_amount, price")
-            .order("robux_amount",{ascending:true});
-        if(priceError) throw priceError;
+        robuxStorePrices=prices.map(function(row){
+            return {
+                robux_amount:Number(row?.robux_amount || 0),
+                price:Number(row?.price || row?.price_idr || 0)
+            };
+        }).filter(function(row){
+            return Number.isInteger(row.robux_amount) && row.robux_amount>0 && row.price>=0;
+        });
 
-        robuxStorePrices=Array.isArray(prices) ? prices : [];
         robuxStoreLoaded=true;
         topupRenderStock();
         topupRenderPrices();
@@ -11381,9 +11392,10 @@ async function loadRobuxStore(){
         topupUpdateButton();
     }catch(error){
         console.error("Robux store load error:",error);
-        topupSetMessage("Gagal memuat Top Up Robux: "+(error.message||"Error"),false);
+        robuxStoreLoaded=false;
         const value=document.getElementById("topupStockValue");
         if(value) value.innerText="GAGAL MEMUAT";
+        topupSetMessage("Gagal memuat Top Up Robux: "+(error.message||"Error")+". Silakan refresh halaman.",false);
     }finally{
         robuxStoreLoading=false;
     }
