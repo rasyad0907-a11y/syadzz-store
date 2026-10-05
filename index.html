@@ -4185,6 +4185,35 @@ textarea:focus{
 .topup-stock.off .topup-stock-value{color:#ff6b7a}
 .topup-status-badge{font-size:11px;font-weight:900;padding:7px 10px;border-radius:999px;background:rgba(0,255,136,.12);color:#00ff88;white-space:nowrap}
 .topup-stock.off .topup-status-badge{background:rgba(255,107,122,.12);color:#ff6b7a}
+
+/* Peringatan Top Up Robux - premium/elegan */
+.topup-warning{
+    position:relative;
+    margin-top:16px;
+    padding:18px 18px 17px;
+    border:1px solid rgba(255,217,0,.24);
+    border-radius:18px;
+    background:linear-gradient(145deg,rgba(255,217,0,.075),rgba(255,255,255,.025));
+    box-shadow:0 10px 30px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.035);
+    overflow:hidden;
+}
+.topup-warning:before{
+    content:"";
+    position:absolute;left:0;top:0;bottom:0;width:4px;
+    background:linear-gradient(180deg,#ffd900,#ff9d00);
+}
+.topup-warning-head{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.topup-warning-icon{
+    width:34px;height:34px;display:grid;place-items:center;flex:0 0 34px;
+    border-radius:11px;background:rgba(255,217,0,.12);
+    border:1px solid rgba(255,217,0,.22);font-size:18px;
+}
+.topup-warning-title{font-size:13px;font-weight:900;letter-spacing:.65px;color:#ffd900}
+.topup-warning-text{font-size:12px;line-height:1.7;color:#c9c9d4}
+.topup-warning-text strong{color:#fff}
+.topup-warning-check{display:flex;align-items:flex-start;gap:10px;margin-top:14px;padding:11px 12px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.06);font-size:12px;line-height:1.45;color:#eee}
+.topup-warning-check input{margin-top:2px;accent-color:#ffd900}
+
 .topup-warning{border:1px solid rgba(255,217,0,.35);background:rgba(255,217,0,.07);border-radius:15px;padding:14px;color:#ddd;font-size:12px;line-height:1.6}
 .topup-warning strong{color:#ffd900}
 .topup-warning-check{display:flex;align-items:flex-start;gap:9px;margin-top:11px;color:#fff;font-weight:700}
@@ -4799,8 +4828,8 @@ textarea:focus{
 <div class="topup-status-badge" id="topupStockStatus">MEMUAT</div>
 </div>
 <div class="topup-warning">
-<strong>⚠️ PERINGATAN PENTING</strong><br>
-Pastikan akun Roblox yang digunakan memenuhi persyaratan usia 18+ dan persyaratan akun yang ditetapkan untuk layanan ini. Jika customer tetap melakukan order dengan akun yang tidak memenuhi persyaratan tersebut, risiko/kendala akibat kondisi akun menjadi tanggung jawab customer dan bukan admin SYADZZ STORE.
+<div class="topup-warning-head"><div class="topup-warning-icon">⚠️</div><div class="topup-warning-title">PERINGATAN PENTING</div></div>
+<div class="topup-warning-text">Pastikan kamu memasukkan <strong>username Roblox yang benar</strong> dan akun yang digunakan memenuhi persyaratan layanan. SYADZZ STORE tidak bertanggung jawab atas kendala yang terjadi apabila customer tetap melakukan order dengan akun yang tidak memenuhi persyaratan tersebut.</div>
 <label class="topup-warning-check"><input type="checkbox" id="topupAgeConfirm"><span>Saya sudah membaca dan memahami peringatan tersebut.</span></label>
 </div>
 </div>
@@ -11244,7 +11273,20 @@ function topupGetPriceRows(){
 
 // Harga tetap SYADZZ STORE: 1 Robux = Rp200.
 // Perhitungan berlaku untuk semua jumlah Robux, termasuk jumlah custom.
-const TOPUP_PRICE_PER_ROBUX = 200;
+const TOPUP_BASE_PRICE_PER_ROBUX = 200;
+
+// Harga per Robux makin murah ketika jumlah pembelian makin besar.
+// Batas terendah tetap Rp156 / Robux.
+function topupUnitPrice(amount){
+    amount=Number(amount||0);
+    if(amount >= 5000) return 156;
+    if(amount >= 2500) return 170;
+    if(amount >= 1000) return 180;
+    if(amount >= 500) return 185;
+    if(amount >= 250) return 190;
+    if(amount >= 100) return 195;
+    return 200;
+}
 
 function topupCalculatePrice(amount){
     amount=Number(amount||0);
@@ -11252,12 +11294,17 @@ function topupCalculatePrice(amount){
         return {ok:false,message:"Minimal pembelian adalah 50 Robux."};
     }
 
-    const total = amount * TOPUP_PRICE_PER_ROBUX;
+    const unitPrice=topupUnitPrice(amount);
+    const total=amount*unitPrice;
+    const baseTotal=amount*TOPUP_BASE_PRICE_PER_ROBUX;
 
     return {
         ok:true,
         total:total,
-        parts:[amount.toLocaleString("id-ID")+" Robux × Rp"+TOPUP_PRICE_PER_ROBUX.toLocaleString("id-ID")]
+        unitPrice:unitPrice,
+        baseTotal:baseTotal,
+        discountPercent:Math.round((1-(unitPrice/TOPUP_BASE_PRICE_PER_ROBUX))*100),
+        parts:[amount.toLocaleString("id-ID")+" Robux × Rp"+unitPrice.toLocaleString("id-ID")]
     };
 }
 
@@ -11284,15 +11331,16 @@ function topupRenderPrices(){
     grid.innerHTML='<div class="topup-price-offers">'+available.map(function(row){
         const disabled=!active || row.amount>stock;
         const status=disabled ? (stock<=0?'STOK HABIS':'MELEBIHI STOK') : 'TERSEDIA';
-        // Harga coret hanya sebagai tampilan perbandingan 14% bila harga sekarang positif.
-        // Tidak mengubah harga database maupun total pembayaran.
-        const oldPrice=row.price>0 ? Math.round(row.price/0.86) : 0;
+        const result=topupCalculatePrice(row.amount);
+        const oldPrice=result.baseTotal;
+        const badge=result.discountPercent>0 ? result.discountPercent+'%' : 'NORMAL';
         return '<div class="topup-price-card '+(disabled?'disabled ':'')+'has-badge" '+(!disabled?'onclick="selectRobuxAmount('+row.amount+')"':'')+'>'+
-            '<div class="topup-price-badge">14%</div>'+
+            '<div class="topup-price-badge">'+badge+'</div>'+
             '<div class="topup-price-card-top"><span class="robux-icon"><span>R</span></span><span>'+row.amount.toLocaleString("id-ID")+'</span></div>'+
             '<div class="topup-price-divider"></div>'+
-            '<div class="topup-price-old">'+(oldPrice?rupiahTopup(oldPrice):'')+'</div>'+
-            '<div class="topup-price-idr">'+rupiahTopup(row.price)+'</div>'+
+            '<div class="topup-price-old">'+(result.discountPercent>0?rupiahTopup(oldPrice):'')+'</div>'+
+            '<div class="topup-price-idr">'+rupiahTopup(result.total)+'</div>'+
+            '<div class="topup-price-unit">Rp'+result.unitPrice.toLocaleString("id-ID")+' / RBX</div>'+
             '<div class="topup-price-status">'+status+'</div>'+
         '</div>';
     }).join('')+'</div>';
@@ -11411,8 +11459,12 @@ async function loadRobuxStore(){
     }
 
     try{
-        // Function lama ini SUDAH ADA di database dan return type-nya tidak diubah.
-        const storeRequest=await supabaseClient.rpc("get_robux_store_v1");
+        // Baca stok dari RPC publik khusus Top Up terlebih dahulu.
+        // Jika v2 belum ada, otomatis fallback ke RPC lama tanpa mengubah data lama.
+        let storeRequest=await supabaseClient.rpc("get_robux_store_customer_v3");
+        if(storeRequest.error){
+            storeRequest=await supabaseClient.rpc("get_robux_store_v1");
+        }
         if(storeRequest.error) throw storeRequest.error;
 
         const rawStoreData=Array.isArray(storeRequest.data) ? storeRequest.data[0] : storeRequest.data;
@@ -11433,7 +11485,7 @@ async function loadRobuxStore(){
             false;
 
         robuxStoreSettings={
-            active:liveActive===true,
+            active:(liveActive===true || liveActive===1 || String(liveActive).toLowerCase()==="true"),
             stock_robux:Number(liveStock)||0
         };
 
@@ -11703,4 +11755,41 @@ body{
 .choice-card:hover .choice-icon,.choice-card:focus-visible .choice-icon{animation:emojiWiggle .45s ease-in-out}.choice-card:active .choice-icon{animation:emojiPop .22s ease-out}
 @keyframes emojiWiggle{0%{transform:translateY(0) rotate(0deg) scale(1)}25%{transform:translateY(-4px) rotate(-8deg) scale(1.08)}50%{transform:translateY(0) rotate(8deg) scale(1.08)}75%{transform:translateY(-2px) rotate(-4deg) scale(1.04)}100%{transform:translateY(0) rotate(0deg) scale(1)}}
 @keyframes emojiPop{0%{transform:scale(1)}50%{transform:scale(1.2) rotate(-5deg)}100%{transform:scale(1)}}
+</style>
+
+<style>
+/* ===== TOP UP WARNING ELEGANT ===== */
+.topup-warning{
+    position:relative;
+    overflow:hidden;
+    border:1px solid rgba(255,217,0,.22);
+    background:linear-gradient(145deg,rgba(255,217,0,.075),rgba(20,20,32,.92));
+    border-radius:18px;
+    padding:18px;
+    box-shadow:0 10px 28px rgba(0,0,0,.16);
+}
+.topup-warning:before{
+    content:"";
+    position:absolute;
+    left:0;top:0;bottom:0;width:4px;
+    background:#ffd900;
+}
+.topup-warning-head{margin-bottom:11px;align-items:center}
+.topup-warning-icon{
+    width:34px;height:34px;
+    display:grid;place-items:center;
+    border-radius:11px;
+    background:rgba(255,217,0,.12);
+    border:1px solid rgba(255,217,0,.18);
+}
+.topup-warning-title{font-size:13px;font-weight:900;letter-spacing:.8px;color:#fff}
+.topup-warning-text{font-size:12px;line-height:1.75;color:#cfd0da}
+.topup-warning-text strong{color:#ffd900}
+.topup-warning-check{
+    background:rgba(255,255,255,.035)!important;
+    border:1px solid rgba(255,255,255,.09)!important;
+    border-radius:12px!important;
+    padding:11px 12px!important;
+}
+.topup-price-unit{font-size:10px;color:#aaa;margin-top:3px}
 </style>
