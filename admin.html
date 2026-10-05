@@ -1486,16 +1486,9 @@ PROMO MONITOR
 .calculator-user-status.revoked{color:#ff9aaa;background:rgba(255,70,100,.06);border:1px solid rgba(255,70,100,.14);}
 .calculator-users-empty{padding:12px;text-align:center;color:#77778d;font-size:10px;border:1px dashed #29293d;border-radius:10px;}
 @media(max-width:700px){.calculator-users-stats{grid-template-columns:repeat(2,1fr);}.calculator-users-toolbar{grid-template-columns:1fr;}}
-</style>
-<style id="syadzz-topup-admin-css">
-.robux-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.robux-admin-stat{background:#11111c;border:1px solid #35354e;border-radius:14px;padding:15px}
-.robux-admin-stat .label{font-size:11px;color:#999;text-transform:uppercase}.robux-admin-stat .value{font-size:24px;font-weight:900;color:#ffd900;margin-top:5px}
-.robux-admin-order{background:#11111c;border:1px solid #35354e;border-radius:14px;padding:13px;margin-top:10px}
-.robux-admin-order-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.robux-admin-order-code{color:#ffd900;font-weight:900}
-.robux-admin-order-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}.robux-admin-order-box{background:#19192d;border-radius:10px;padding:9px}.robux-admin-order-box small{display:block;color:#888;font-size:10px;margin-bottom:3px}.robux-admin-order-box strong{font-size:12px;word-break:break-word}
-.robux-admin-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.robux-admin-actions button{flex:1;min-width:130px}.robux-admin-note{color:#888;font-size:11px;line-height:1.5;margin-top:8px}
-@media(max-width:700px){.robux-admin-grid,.robux-admin-order-meta{grid-template-columns:1fr}}
+
+/* ===== TOP UP ROBUX ADMIN ===== */
+.robux-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}.robux-admin-stat{padding:14px;border:1px solid #303047;border-radius:12px;background:#11111c}.robux-admin-stat .label{font-size:10px;color:#9696ad;text-transform:uppercase}.robux-admin-stat .value{margin-top:5px;font-size:18px;font-weight:800;color:#ffd900}.robux-admin-note{margin-top:10px;padding:10px;border-radius:10px;background:#171727;color:#aaa;font-size:11px;line-height:1.55}.robux-admin-order{margin-top:10px;padding:12px;border:1px solid #303047;border-radius:12px;background:#11111c}.robux-admin-order-head{display:flex;justify-content:space-between;gap:10px;font-weight:800}.robux-admin-order-code{color:#ffd900}.robux-admin-order-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:10px}.robux-admin-order-box{padding:8px;border-radius:9px;background:#19192d}.robux-admin-order-box small{display:block;color:#888;font-size:9px}.robux-admin-order-box strong{display:block;margin-top:3px;font-size:11px;word-break:break-word}.robux-admin-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.robux-admin-danger{border-color:#6a3030!important}@media(max-width:650px){.robux-admin-grid,.robux-admin-order-meta{grid-template-columns:1fr}.robux-admin-actions .btn{width:100%}}
 </style>
 </head>
 
@@ -2247,55 +2240,24 @@ PROMO MONITOR
     </div>
 
 
-    <div
-        id="robuxSection"
-        class="collapse-card"
-    >
+    <div id="robuxSection" class="collapse-card">
         <button type="button" class="collapse-header" onclick="toggleSection('robuxSection')">
-            <span class="collapse-title">💰 TOP UP ROBUX</span>
-            <span class="collapse-arrow">▶</span>
+            <span class="collapse-title">💰 TOP UP ROBUX</span><span class="collapse-arrow">▶</span>
         </button>
         <div class="collapse-content">
             <div id="robuxAdminMessage" class="message"></div>
             <div class="robux-admin-grid">
-                <div class="robux-admin-stat">
-                    <div class="label">Stok Robux</div>
-                    <div class="value" id="robuxAdminStockText">0 RBX</div>
-                </div>
-                <div class="robux-admin-stat">
-                    <div class="label">Status Top Up</div>
-                    <div class="value" id="robuxAdminStatusText">NONAKTIF</div>
-                </div>
+                <div class="robux-admin-stat"><div class="label">STOK ROBUX</div><div class="value" id="robuxAdminStockText">0 RBX</div></div>
+                <div class="robux-admin-stat"><div class="label">STATUS TOP UP</div><div class="value" id="robuxAdminStatusText">NONAKTIF</div></div>
             </div>
             <div class="form-grid" style="margin-top:12px">
-                <div>
-                    <label>Stok Robux</label>
-                    <input type="number" id="robuxAdminStockInput" min="0" step="1" placeholder="5000">
-                </div>
-                <div>
-                    <label>Status</label>
-                    <select id="robuxAdminActiveInput">
-                        <option value="true">AKTIF</option>
-                        <option value="false">NONAKTIF / HABIS</option>
-                    </select>
-                </div>
+                <div><label>Stok Robux</label><input type="number" id="robuxAdminStockInput" min="0" step="1" placeholder="5000"></div>
+                <div><label>Status</label><select id="robuxAdminActiveInput"><option value="true">AKTIF</option><option value="false">NONAKTIF / HABIS</option></select></div>
             </div>
-            <button class="btn btn-primary full" type="button" onclick="saveRobuxAdminSettings()">SIMPAN STOK & STATUS</button>
-            <div class="robux-admin-note">Stok adalah total Robux yang boleh dibeli customer. Satu customer boleh membeli seluruh stok yang tersedia, selama stok masih mencukupi.</div>
-
-            <div class="robux-admin-note" style="margin-top:18px"><strong>Harga Robux ditetapkan otomatis oleh sistem.</strong><br>Admin hanya mengatur total stok dan status Top Up. Harga tidak dapat diubah dari panel admin.</div>
-
+            <button class="btn btn-primary full" type="button" onclick="saveRobuxAdminSettings()">SIMPAN STOK &amp; STATUS</button>
+            <div class="robux-admin-note">Admin hanya mengatur stok global dan status Top Up. Harga Robux ditetapkan otomatis oleh sistem dan tidak dapat diedit dari panel admin.</div>
             <div class="form-title" style="margin-top:22px">ORDER TOP UP ROBUX</div>
-            <div class="filter-row">
-                <input type="text" id="robuxOrderSearch" placeholder="Cari ID / username..." oninput="renderRobuxOrdersAdmin()">
-                <select id="robuxOrderStatusFilter" onchange="renderRobuxOrdersAdmin()">
-                    <option value="">Semua Status</option>
-                    <option value="MENUNGGU VERIFIKASI">Menunggu Verifikasi</option>
-                    <option value="DIPROSES">Diproses</option>
-                    <option value="SELESAI">Selesai</option>
-                    <option value="DIBATALKAN">Dibatalkan</option>
-                </select>
-            </div>
+            <div class="filter-row"><input type="text" id="robuxOrderSearch" placeholder="Cari ID / username..." oninput="renderRobuxOrdersAdmin()"><select id="robuxOrderStatusFilter" onchange="renderRobuxOrdersAdmin()"><option value="">Semua Status</option><option value="MENUNGGU VERIFIKASI">Menunggu Verifikasi</option><option value="DIPROSES">Diproses</option><option value="SELESAI">Selesai</option><option value="DIBATALKAN">Dibatalkan</option></select></div>
             <div id="robuxOrdersContainer"></div>
         </div>
     </div>
@@ -2355,9 +2317,10 @@ PROMO MONITOR
 
                 <select id="maintenanceTarget">
                     <option value="all">Semua Website</option>
-                    <option value="speed">Main Web / Speed Steal</option>
-                    <option value="joki">Joki</option>
-                    <option value="topup">💰 Top Up Robux</option>
+                    <option value="all_game_services">🎮 ALL GAME SERVICES</option>
+                    <option value="speed">⚡ KALKULATOR SPEED</option>
+                    <option value="joki">🥚 JOKI EGG</option>
+                    <option value="topup">💰 TOP UP ROBUX</option>
                 </select>
 
                 <div class="small-text" style="margin-top:7px;">
@@ -2527,8 +2490,6 @@ let manualJokiQueue = [];
 let allCombos = [];
 let allPromos = [];
 let allPackageSlots = [];
-let allRobuxOrders=[]; let robuxAdminSettings={active:false,stock_robux:0};
-
 let allCalculatorUsers = [];
 
 
@@ -3310,8 +3271,6 @@ async function loadEverything(){
         loadPackageSlotsAdmin(),
         loadPromos(),
         loadStoreSettingsAdmin(),
-        loadCalculatorPaymentRequests(),
-        loadCalculatorUsers(),
         loadCalculatorPaymentRequests(),
         loadCalculatorUsers(),
         loadRobuxAdmin()
@@ -6854,91 +6813,36 @@ async function deletePromo(promoId){
 /* =====================================================
 TOP UP ROBUX ADMIN
 ===================================================== */
-function robuxAdminRupiah(value){return "Rp"+Number(value||0).toLocaleString("id-ID");}
-function robuxAdminEscape(value){return escapeHtml(String(value??""));}
-
+let robuxAdminSettings={active:false,stock:0};
+let allRobuxOrders=[];
+function robuxAdminRupiah(v){return "Rp"+Number(v||0).toLocaleString("id-ID");}
+function robuxAdminEscape(v){return escapeHtml(String(v??""));}
 async function loadRobuxAdmin(){
-    try{
-        const [settingsRes,ordersRes]=await Promise.all([
-            supabaseClient.from("robux_store_settings").select("*").eq("id",1).maybeSingle(),
-            supabaseClient.from("robux_orders").select("*").order("created_at",{ascending:false})
-        ]);
-        if(settingsRes.error) throw settingsRes.error;
-        if(ordersRes.error) throw ordersRes.error;
-        robuxAdminSettings=settingsRes.data||{active:false,stock_robux:0};
-        allRobuxOrders=ordersRes.data||[];
-        const stock=document.getElementById("robuxAdminStockText");
-        const status=document.getElementById("robuxAdminStatusText");
-        const stockInput=document.getElementById("robuxAdminStockInput");
-        const activeInput=document.getElementById("robuxAdminActiveInput");
-        if(stock) stock.innerText=Number(robuxAdminSettings.stock_robux||0).toLocaleString("id-ID")+" RBX";
-        if(status) status.innerText=robuxAdminSettings.active===true ? "AKTIF" : "NONAKTIF";
-        if(stockInput) stockInput.value=Number(robuxAdminSettings.stock_robux||0);
-        if(activeInput) activeInput.value=String(robuxAdminSettings.active===true);
-        renderRobuxOrdersAdmin();
-    }catch(error){
-        const el=document.getElementById("robuxAdminMessage");
-        if(el){el.className="message error";el.innerText="Gagal memuat Top Up Robux: "+(error.message||"Error");}
-    }
+ try{
+  const [s,o]=await Promise.all([
+   supabaseClient.from("robux_store_settings").select("id,stock,active,updated_at").eq("id",1).maybeSingle(),
+   supabaseClient.from("robux_orders").select("id,order_code,roblox_username,robux_amount,total_price,payment_method,payment_proof_path,status,created_at,updated_at,completed_at").order("created_at",{ascending:false})
+  ]);
+  if(s.error)throw s.error;if(o.error)throw o.error;
+  robuxAdminSettings=s.data||{active:false,stock:0};allRobuxOrders=o.data||[];
+  const stock=Number(robuxAdminSettings.stock||0);const active=robuxAdminSettings.active===true&&stock>0;
+  const a=document.getElementById("robuxAdminStockText"),b=document.getElementById("robuxAdminStatusText"),c=document.getElementById("robuxAdminStockInput"),d=document.getElementById("robuxAdminActiveInput");
+  if(a)a.innerText=stock.toLocaleString("id-ID")+" RBX";if(b)b.innerText=active?"AKTIF":"NONAKTIF / HABIS";if(c)c.value=stock;if(d)d.value=String(robuxAdminSettings.active===true);renderRobuxOrdersAdmin();
+ }catch(e){const m=document.getElementById("robuxAdminMessage");if(m){m.className="message error";m.innerText="Gagal memuat Top Up Robux: "+(e.message||"Error");}}
 }
-
 async function saveRobuxAdminSettings(){
-    const stock=Number(document.getElementById("robuxAdminStockInput")?.value||0);
-    const active=document.getElementById("robuxAdminActiveInput")?.value==="true";
-    const msg=document.getElementById("robuxAdminMessage");
-    if(!Number.isInteger(stock)||stock<0){if(msg){msg.className="message error";msg.innerText="Stok tidak valid.";}return;}
-    try{
-        const {error}=await supabaseClient.rpc("admin_update_robux_store_v1",{p_stock_robux:stock,p_active:active});
-        if(error) throw error;
-        if(msg){msg.className="message success";msg.innerText="Stok & status Top Up berhasil disimpan.";}
-        await loadRobuxAdmin();
-    }catch(error){if(msg){msg.className="message error";msg.innerText="Gagal menyimpan: "+(error.message||"Error");}}
+ const stock=Number(document.getElementById("robuxAdminStockInput")?.value||0),active=document.getElementById("robuxAdminActiveInput")?.value==="true",m=document.getElementById("robuxAdminMessage");
+ if(!Number.isInteger(stock)||stock<0){if(m){m.className="message error";m.innerText="Stok tidak valid.";}return;}
+ try{const {error}=await supabaseClient.rpc("admin_update_robux_store_v1",{p_active:active,p_stock_robux:stock});if(error)throw error;if(m){m.className="message success";m.innerText="Stok & status Top Up berhasil disimpan.";}await loadRobuxAdmin();}catch(e){if(m){m.className="message error";m.innerText="Gagal menyimpan: "+(e.message||"Error");}}
 }
-
-
 function renderRobuxOrdersAdmin(){
-    const c=document.getElementById("robuxOrdersContainer"); if(!c)return;
-    const q=(document.getElementById("robuxOrderSearch")?.value||"").trim().toLowerCase();
-    const st=document.getElementById("robuxOrderStatusFilter")?.value||"";
-    const rows=allRobuxOrders.filter(o=>(!q||String(o.order_code).toLowerCase().includes(q)||String(o.username_roblox).toLowerCase().includes(q)||String(o.whatsapp_customer).toLowerCase().includes(q))&&(!st||o.status===st));
-    if(!rows.length){c.innerHTML='<div class="empty">Belum ada order Top Up Robux yang cocok.</div>';return;}
-    c.innerHTML=rows.map(o=>`<div class="robux-admin-order">
-        <div class="robux-admin-order-head"><div class="robux-admin-order-code">${robuxAdminEscape(o.order_code)}</div><div>${robuxAdminEscape(o.status)}</div></div>
-        <div class="robux-admin-order-meta">
-            <div class="robux-admin-order-box"><small>Username</small><strong>${robuxAdminEscape(o.username_roblox)}</strong></div>
-            <div class="robux-admin-order-box"><small>Robux</small><strong>${Number(o.robux_amount||0).toLocaleString("id-ID")} RBX</strong></div>
-            <div class="robux-admin-order-box"><small>Total</small><strong>${robuxAdminRupiah(o.total_amount)}</strong></div>
-            <div class="robux-admin-order-box"><small>WA</small><strong>${robuxAdminEscape(o.whatsapp_customer)}</strong></div>
-            <div class="robux-admin-order-box"><small>Pembayaran</small><strong>${robuxAdminEscape(o.payment_method)}</strong></div>
-            <div class="robux-admin-order-box"><small>18+</small><strong>${o.customer_18_confirmed?'✓ Disetujui':'Tidak'}</strong></div>
-        </div>
-        <div class="robux-admin-note">Dibuat: ${formatDate(o.created_at)} · Bukti: ${o.proof_path?'Tersimpan':'Belum ada'}</div>
-        <div class="robux-admin-actions">
-            ${o.proof_path?`<button class="btn btn-secondary" type="button" onclick="viewRobuxProof(${o.id})">LIHAT BUKTI</button>`:''}
-            ${o.status!=='DIBATALKAN'&&o.status!=='SELESAI'?`<button class="btn btn-primary" type="button" onclick="setRobuxOrderStatusAdmin(${o.id},'DIPROSES')">PROSES</button>`:''}
-            ${o.status==='DIPROSES'?`<button class="btn btn-primary" type="button" onclick="setRobuxOrderStatusAdmin(${o.id},'SELESAI')">SELESAI</button>`:''}
-            ${o.status!=='DIBATALKAN'&&o.status!=='SELESAI'?`<button class="btn btn-secondary robux-admin-danger" type="button" onclick="setRobuxOrderStatusAdmin(${o.id},'DIBATALKAN')">BATALKAN + KEMBALIKAN STOK</button>`:''}
-        </div>
-    </div>`).join("");
+ const c=document.getElementById("robuxOrdersContainer");if(!c)return;const q=(document.getElementById("robuxOrderSearch")?.value||"").trim().toLowerCase(),st=document.getElementById("robuxOrderStatusFilter")?.value||"";
+ const rows=allRobuxOrders.filter(o=>{const hay=[o.order_code,o.roblox_username,o.payment_method,o.status].map(v=>String(v??"").toLowerCase()).join(" ");return(!q||hay.includes(q))&&(!st||o.status===st);});
+ if(!rows.length){c.innerHTML='<div class="empty">Belum ada order Top Up Robux yang cocok.</div>';return;}
+ c.innerHTML=rows.map(o=>`<div class="robux-admin-order"><div class="robux-admin-order-head"><div class="robux-admin-order-code">${robuxAdminEscape(o.order_code)}</div><div>${robuxAdminEscape(o.status)}</div></div><div class="robux-admin-order-meta"><div class="robux-admin-order-box"><small>Username</small><strong>${robuxAdminEscape(o.roblox_username)}</strong></div><div class="robux-admin-order-box"><small>Robux</small><strong>${Number(o.robux_amount||0).toLocaleString("id-ID")} RBX</strong></div><div class="robux-admin-order-box"><small>Total</small><strong>${robuxAdminRupiah(o.total_price)}</strong></div><div class="robux-admin-order-box"><small>Pembayaran</small><strong>${robuxAdminEscape(o.payment_method)}</strong></div><div class="robux-admin-order-box"><small>Dibuat</small><strong>${robuxAdminEscape(formatDate(o.created_at))}</strong></div><div class="robux-admin-order-box"><small>Bukti</small><strong>${o.payment_proof_path?'Tersimpan':'Belum ada'}</strong></div></div><div class="robux-admin-actions">${o.payment_proof_path?`<button class="btn btn-secondary" type="button" onclick="viewRobuxProof('${String(o.id)}')">LIHAT BUKTI</button>`:''}${o.status!=='DIBATALKAN'&&o.status!=='SELESAI'?`<button class="btn btn-primary" type="button" onclick="setRobuxOrderStatusAdmin('${String(o.id)}','DIPROSES')">PROSES</button>`:''}${o.status==='DIPROSES'?`<button class="btn btn-primary" type="button" onclick="setRobuxOrderStatusAdmin('${String(o.id)}','SELESAI')">SELESAI</button>`:''}${o.status!=='DIBATALKAN'&&o.status!=='SELESAI'?`<button class="btn btn-secondary robux-admin-danger" type="button" onclick="setRobuxOrderStatusAdmin('${String(o.id)}','DIBATALKAN')">BATALKAN + KEMBALIKAN STOK</button>`:''}</div></div>`).join("");
 }
-
-async function setRobuxOrderStatusAdmin(id,status){
-    const text=status==='DIBATALKAN'?"Batalkan order dan kembalikan stok Robux?":("Ubah status menjadi "+status+"?");
-    if(!confirm(text))return;
-    try{const {error}=await supabaseClient.rpc("admin_set_robux_order_status_v1",{p_order_id:Number(id),p_status:status});if(error)throw error;await loadRobuxAdmin();}
-    catch(error){alert("Gagal mengubah status:\n"+(error.message||"Error"));}
-}
-
-async function viewRobuxProof(orderId){
-    const order=allRobuxOrders.find(o=>Number(o.id)===Number(orderId));
-    if(!order?.proof_path){alert("Bukti pembayaran belum tersedia.");return;}
-    try{
-        const {data,error}=await supabaseClient.storage.from("payment-proofs").createSignedUrl(order.proof_path,300);
-        if(error)throw error;
-        if(!data?.signedUrl)throw new Error("Signed URL tidak tersedia.");
-        window.open(data.signedUrl,"_blank","noopener,noreferrer");
-    }catch(error){alert("Gagal membuka bukti:\n"+(error.message||"Error"));}
-}
+async function setRobuxOrderStatusAdmin(id,status){if(!confirm(status==='DIBATALKAN'?"Batalkan order dan kembalikan stok Robux?":"Ubah status menjadi "+status+"?"))return;try{const {error}=await supabaseClient.rpc("admin_set_robux_order_status_v1",{p_order_id:id,p_status:status});if(error)throw error;await loadRobuxAdmin();}catch(e){alert("Gagal mengubah status:\n"+(e.message||"Error"));}}
+async function viewRobuxProof(id){const o=allRobuxOrders.find(x=>String(x.id)===String(id));if(!o?.payment_proof_path){alert("Bukti pembayaran belum tersedia.");return;}try{const {data,error}=await supabaseClient.storage.from("payment-proofs").createSignedUrl(o.payment_proof_path,300);if(error)throw error;if(!data?.signedUrl)throw new Error("Signed URL tidak tersedia.");window.open(data.signedUrl,"_blank","noopener,noreferrer");}catch(e){alert("Gagal membuka bukti:\n"+(e.message||"Error"));}}
 
 /* =====================================================
 WEBSITE SETTINGS
