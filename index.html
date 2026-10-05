@@ -5283,32 +5283,42 @@ function hideCalculatorFollowGate(){
 }
 
 function startCalculatorFollowCountdown(){
-    if(calculatorFreeBusy && calculatorFollowCountdownTimer) return;
+    if(calculatorFollowCountdownTimer) return;
+
     const steps=document.getElementById("calculatorFollowSteps");
     const countdown=document.getElementById("calculatorFollowCountdown");
     const followBtn=document.getElementById("calculatorFollowButton");
     const resumeBtn=document.getElementById("calculatorFollowResumeButton");
     const status=document.getElementById("calculatorFollowStatus");
     const secondsEl=document.getElementById("calculatorFollowSeconds");
+
     if(steps) steps.style.display="none";
     if(countdown) countdown.style.display="block";
     if(followBtn) followBtn.style.display="none";
     if(resumeBtn) resumeBtn.style.display="none";
     if(status) status.innerText="Countdown berjalan. Jangan tutup halaman sampai selesai.";
     calculatorFollowWaitingForReturn=false;
-    let seconds=60;
-    if(secondsEl) secondsEl.innerText=seconds;
-    calculatorFollowCountdownTimer=setInterval(async ()=>{
-        if(document.hidden) return;
-        seconds--;
-        if(secondsEl) secondsEl.innerText=seconds;
-        if(seconds<=0){
+
+    // Gunakan timestamp nyata agar countdown tidak macet karena perpindahan tab/fokus.
+    const endAt=Date.now()+60000;
+    let lastShown=-1;
+
+    const tick=()=>{
+        const remaining=Math.max(0,Math.ceil((endAt-Date.now())/1000));
+        if(remaining!==lastShown){
+            lastShown=remaining;
+            if(secondsEl) secondsEl.innerText=remaining;
+        }
+        if(remaining<=0){
             clearInterval(calculatorFollowCountdownTimer);
             calculatorFollowCountdownTimer=null;
             if(status) status.innerText="Memproses akses GRATIS dan menampilkan hasil...";
-            await finishCalculatorFreeFlow();
+            finishCalculatorFreeFlow();
         }
-    },1000);
+    };
+
+    tick();
+    calculatorFollowCountdownTimer=setInterval(tick,250);
 }
 
 async function finishCalculatorFreeFlow(){
