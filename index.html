@@ -4676,7 +4676,7 @@ Pilih akun Google yang ingin digunakan untuk Kalkulator Speed.
 </div>
 </div>
 
-<div id="calculatorRecoveryPanel" style="display:none;"></div> style="display:none;"></div>
+<div id="calculatorRecoveryPanel" style="display:none;"></div>
 <div id="calculatorPasswordRecoveryPanel" style="display:none;"></div>
 
 <div id="calculatorAccountPanel" style="display:none;">
@@ -5236,21 +5236,58 @@ function setCalculatorFreeCooldownMessage(left){
 function startCalculatorFreeCooldown(seconds, onDone){
     stopCalculatorFreeCooldown();
 
+    const box = document.getElementById("calculatorFreeCooldown");
     const total = Math.max(1, Number(seconds) || CALCULATOR_FREE_COOLDOWN_SECONDS);
-    const end = Date.now() + total * 1000;
+    const end = Date.now() + (total * 1000);
+
+    // Simpan waktu akhir supaya countdown tetap benar ketika tab berpindah.
     localStorage.setItem(CALCULATOR_FREE_COOLDOWN_KEY, String(end));
 
-    const tick = function(){
-        const left = Math.max(0, Math.ceil((end - Date.now()) / 1000));
-        setCalculatorFreeCooldownMessage(left);
+    if(box){
+        box.style.display = "block";
+    }
 
-        if(left <= 0){
-            stopCalculatorFreeCooldown();
-            localStorage.removeItem(CALCULATOR_FREE_COOLDOWN_KEY);
-            if(typeof onDone === "function") onDone();
+    setCalculatorCalculateButtonState(false);
+
+    let finished = false;
+
+    const finish = function(){
+        if(finished) return;
+        finished = true;
+
+        stopCalculatorFreeCooldown();
+        localStorage.removeItem(CALCULATOR_FREE_COOLDOWN_KEY);
+
+        if(box){
+            box.style.display = "block";
+            box.innerText = "✅ Countdown selesai. Menampilkan hasil kalkulator...";
+        }
+
+        if(typeof onDone === "function"){
+            Promise.resolve(onDone()).catch(function(error){
+                console.error("Calculator countdown callback error:", error);
+                const status = document.getElementById("dataStatus");
+                if(status) status.innerText = "❌ Gagal menampilkan hasil kalkulator.";
+            });
         }
     };
 
+    const tick = function(){
+        const left = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+
+        if(box){
+            box.style.display = "block";
+            box.innerText = left > 0
+                ? "⏳ Iklan sudah dibuka. Hasil muncul dalam " + left + " detik."
+                : "✅ Countdown selesai. Menampilkan hasil kalkulator...";
+        }
+
+        if(left <= 0){
+            finish();
+        }
+    };
+
+    // Langsung tampilkan 120, lalu turun setiap detik.
     tick();
     calculatorFreeCooldownTimer = setInterval(tick, 1000);
 }
@@ -5258,20 +5295,32 @@ function startCalculatorFreeCooldown(seconds, onDone){
 function restoreCalculatorFreeAdCooldown(){
     if(calculatorPremiumActive) return;
 
-    const storedEnd = Number(localStorage.getItem(CALCULATOR_FREE_COOLDOWN_KEY) || 0);
+    const storedEnd = Number(
+        localStorage.getItem(CALCULATOR_FREE_COOLDOWN_KEY) || 0
+    );
+
     if(!storedEnd) return;
 
     const left = Math.max(0, Math.ceil((storedEnd - Date.now()) / 1000));
     const resultCard = document.getElementById("calculatorResultCard");
 
     if(left > 0){
+        // Selama countdown, hasil tetap tersembunyi.
         if(resultCard) resultCard.style.display = "none";
         calculatorFreeBusy = true;
         setCalculatorCalculateButtonState(false);
-        startCalculatorFreeCooldown(left, function(){
+
+        startCalculatorFreeCooldown(left, async function(){
             if(resultCard) resultCard.style.display = "";
+
             calculatorFreeBusy = false;
+            calculatorFreeReady = false;
             setCalculatorCalculateButtonState(false);
+
+            const status = document.getElementById("dataStatus");
+            if(status){
+                status.innerText = "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
+            }
         });
     }else{
         localStorage.removeItem(CALCULATOR_FREE_COOLDOWN_KEY);
@@ -5279,7 +5328,9 @@ function restoreCalculatorFreeAdCooldown(){
 }
 
 document.addEventListener("visibilitychange", function(){
-    if(!document.hidden) restoreCalculatorFreeAdCooldown();
+    if(!document.hidden){
+        restoreCalculatorFreeAdCooldown();
+    }
 });
 
 async function getCalculatorFreeAccess(){
@@ -5569,21 +5620,21 @@ async function loadCalculatorAccess(){
         const state = document.getElementById("calculatorAccessState");
         if(state){
             state.className = "calc-status error";
-            state.innerText = "❌ Pengajuan sebelumnya ditolak. Kamu tetap bisa memakai Mode Gratis 1 kali per hari atau mengajukan pembayaran kembali.";
+            state.innerText = "❌ Pengajuan sebelumnya ditolak. Kamu tetap bisa memakai Mode Gratis 1 kali setiap 2 hari atau mengajukan pembayaran kembali.";
         }
         setCalculatorPaymentStatus("Pengajuan ditolak. Mode Gratis tetap tersedia.", "error");
     }else if(status === "revoked"){
         const state = document.getElementById("calculatorAccessState");
         if(state){
             state.className = "calc-status error";
-            state.innerText = "🚫 Akses Premium dicabut admin. Mode Gratis tetap tersedia 1 kali setiap 3 hari.";
+            state.innerText = "🚫 Akses Premium dicabut admin. Mode Gratis tetap tersedia 1 kali setiap 2 hari.";
         }
         setCalculatorPaymentStatus("Premium sedang nonaktif. Mode Gratis tetap tersedia.", "error");
     }else{
         const state = document.getElementById("calculatorAccessState");
         if(state){
             state.className = "calc-status waiting";
-            state.innerText = "🆓 Mode Gratis: 1 kali penggunaan setiap 3 hari. Atau bayar Rp5.000 sekali untuk Premium permanent.";
+            state.innerText = "🆓 Mode Gratis: 1 kali penggunaan setiap 2 hari. Atau bayar Rp5.000 sekali untuk Premium permanent.";
         }
         setCalculatorPaymentStatus("Belum ada pengajuan Premium. Mode Gratis tetap tersedia.", "waiting");
     }
@@ -8807,18 +8858,171 @@ async function getCalculatorFreeAccessConsume(){
 
 async function hitung(){
 
+    const status = document.getElementById("dataStatus");
+
+    // =========================
+    // CEK LOGIN
+    // =========================
     if(!calculatorAccessUser){
-        const status = document.getElementById("dataStatus");
-        if(status) status.innerText = "🔒 Login terlebih dahulu untuk menggunakan kalkulator.";
+        if(status){
+            status.innerText = "🔒 Login terlebih dahulu untuk menggunakan kalkulator.";
+        }
         await loadCalculatorAccess();
         return;
     }
 
-    const status = document.getElementById("dataStatus");
+    // =========================
+    // PREMIUM
+    // =========================
+    // Premium selalu langsung menghitung. Tidak melewati iklan / kuota Free.
+    if(calculatorPremiumActive){
+        calculatorPlan = "premium";
+        setCalculatorPlanButtons();
+        calculatorFreeBusy = false;
+        setCalculatorCalculateButtonState(true);
+
+        return runCalculatorNow();
+    }
+
+    // =========================
+    // FREE
+    // =========================
+    calculatorPlan = "free";
+    setCalculatorPlanButtons();
 
     if(calculatorFreeBusy){
+        if(status) status.innerText = "⏳ Countdown masih berjalan. Tunggu sampai 0.";
         return;
     }
+
+    // Cek ulang ke Supabase agar status kuota selalu terbaru.
+    const access = await getCalculatorFreeAccess();
+
+    if(!access || access.ok === false){
+        if(status){
+            status.innerText = access?.message || "❌ Gagal mengecek jatah GRATIS.";
+        }
+        return;
+    }
+
+    if(access.available !== true){
+        calculatorFreeReady = false;
+        setCalculatorFreeStatus(false, "TERPAKAI 2 HARI");
+        setCalculatorCalculateButtonState(false);
+
+        const box = document.getElementById("calculatorFreeCooldown");
+        if(box){
+            box.style.display = "block";
+            box.innerText = access.next_available_at
+                ? "⏳ Jatah GRATIS dapat digunakan kembali " + new Date(access.next_available_at).toLocaleString("id-ID", {timeZone:"Asia/Jakarta"}) + "."
+                : "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
+        }
+
+        if(status){
+            status.innerText = "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
+        }
+        return;
+    }
+
+    calculatorFreeReady = true;
+    calculatorFreeBusy = true;
+    setCalculatorCalculateButtonState(false);
+
+    // =========================
+    // BUKA IKLAN
+    // =========================
+    if(status) status.innerText = "📢 Membuka iklan...";
+
+    const adWindow = window.open(
+        CALCULATOR_FREE_AD_URL,
+        "_blank",
+        "noopener,noreferrer"
+    );
+
+    if(!adWindow){
+        calculatorFreeBusy = false;
+        calculatorFreeReady = true;
+        setCalculatorCalculateButtonState(true);
+        if(status){
+            status.innerText = "⚠️ Iklan diblokir browser. Izinkan pop-up lalu klik HITUNG lagi.";
+        }
+        return;
+    }
+
+    // =========================
+    // KONSUMSI KUOTA
+    // =========================
+    const consumed = await getCalculatorFreeAccessConsume();
+
+    if(!consumed || consumed.ok !== true || consumed.allowed !== true){
+        calculatorFreeBusy = false;
+        calculatorFreeReady = false;
+        setCalculatorCalculateButtonState(false);
+
+        try{ adWindow.close(); }catch(_){}
+
+        const message = consumed?.message || "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
+
+        setCalculatorFreeStatus(false, "TERPAKAI 2 HARI");
+
+        const box = document.getElementById("calculatorFreeCooldown");
+        if(box){
+            box.style.display = "block";
+            box.innerText = message;
+        }
+
+        if(status) status.innerText = message;
+        return;
+    }
+
+    // Kuota berhasil dipakai. Sekarang hasil dihitung tetapi disembunyikan.
+    calculatorFreeReady = false;
+    setCalculatorFreeStatus(false, "TERPAKAI 2 HARI");
+
+    const resultCard = document.getElementById("calculatorResultCard");
+    if(resultCard) resultCard.style.display = "none";
+
+    try{
+        await runCalculatorNow();
+    }catch(error){
+        console.error("Calculator calculation error:", error);
+        calculatorFreeBusy = false;
+        if(status) status.innerText = "❌ Gagal menghitung. Silakan cek input kalkulator.";
+        return;
+    }
+
+    // =========================
+    // COUNTDOWN 120 DETIK
+    // =========================
+    if(status){
+        status.innerText = "⏳ Iklan sudah dibuka. Countdown 120 detik sedang berjalan.";
+    }
+
+    startCalculatorFreeCooldown(
+        CALCULATOR_FREE_COOLDOWN_SECONDS,
+        async function(){
+            if(resultCard) resultCard.style.display = "";
+
+            calculatorFreeBusy = false;
+            calculatorFreeReady = false;
+            setCalculatorCalculateButtonState(false);
+
+            const box = document.getElementById("calculatorFreeCooldown");
+            if(box){
+                box.style.display = "block";
+                box.innerText = "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
+            }
+
+            if(status){
+                status.innerText = "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
+            }
+        }
+    );
+}
+
+// Menghitung dan menampilkan hasil tanpa melewati logika Free/Premium.
+async function runCalculatorNow(){
+    const status = document.getElementById("dataStatus");
 
     const treadmill = Number(document.getElementById("treadmill").value);
     const trail = Number(document.getElementById("trail").value);
@@ -8828,121 +9032,31 @@ async function hitung(){
 
     if(!Number.isFinite(currentSpeed) || currentSpeed < 0){
         if(status) status.innerText = "Speed sekarang tidak valid.";
-        return;
+        throw new Error("Speed sekarang tidak valid.");
     }
 
     if(!Number.isFinite(hours) || hours < 0){
         if(status) status.innerText = "Waktu AFK tidak valid.";
-        return;
+        throw new Error("Waktu AFK tidak valid.");
     }
 
     const STEPS_PER_SECOND = 22;
-
-    const gainPerStep =
-        treadmill *
-        (trail + multiplier - 1);
-
+    const gainPerStep = treadmill * (trail + multiplier - 1);
     const gainPerSecond = gainPerStep * STEPS_PER_SECOND;
     const gainPerMinute = gainPerSecond * 60;
     const gainPerHour = gainPerSecond * 3600;
     const gainFromAFK = gainPerHour * hours;
     const totalAfterAFK = currentSpeed + gainFromAFK;
 
-    function renderCalculatorResult(){
-        document.getElementById("resultCurrentSpeed").innerText = formatNumber(currentSpeed);
-        document.getElementById("resultGainStep").innerText = formatNumber(gainPerStep);
-        document.getElementById("resultGainSecond").innerText = formatNumber(gainPerSecond);
-        document.getElementById("resultGainMinute").innerText = formatNumber(gainPerMinute);
-        document.getElementById("resultGainHour").innerText = formatNumber(gainPerHour);
-        document.getElementById("resultAFK").innerText = formatNumber(gainFromAFK);
-        document.getElementById("resultTotal").innerText = formatNumber(totalAfterAFK);
+    document.getElementById("resultCurrentSpeed").innerText = formatNumber(currentSpeed);
+    document.getElementById("resultGainStep").innerText = formatNumber(gainPerStep);
+    document.getElementById("resultGainSecond").innerText = formatNumber(gainPerSecond);
+    document.getElementById("resultGainMinute").innerText = formatNumber(gainPerMinute);
+    document.getElementById("resultGainHour").innerText = formatNumber(gainPerHour);
+    document.getElementById("resultAFK").innerText = formatNumber(gainFromAFK);
+    document.getElementById("resultTotal").innerText = formatNumber(totalAfterAFK);
 
-        if(status) status.innerText = "Perhitungan berhasil.";
-    }
-
-    // Premium tetap langsung mendapatkan hasil tanpa iklan/countdown.
-    if(calculatorPremiumActive){
-        calculatorPlan = "premium";
-        setCalculatorPlanButtons();
-        setCalculatorCalculateButtonState(true);
-        renderCalculatorResult();
-        return;
-    }
-
-    calculatorPlan = "free";
-    setCalculatorPlanButtons();
-
-    // Free harus tersedia sebelum membuka iklan.
-    if(!calculatorFreeReady){
-        if(status) status.innerText = "⏳ Jatah Free belum tersedia. Tunggu sampai 2 hari berikutnya.";
-        return;
-    }
-
-    calculatorFreeBusy = true;
-    setCalculatorCalculateButtonState(false);
-
-    if(status) status.innerText = "📢 Membuka iklan...";
-
-    // Iklan dibuka oleh aksi klik HITUNG user.
-    const adWindow = window.open(
-        CALCULATOR_FREE_AD_URL,
-        "_blank",
-        "noopener,noreferrer"
-    );
-
-    if(!adWindow){
-        calculatorFreeBusy = false;
-        setCalculatorCalculateButtonState(true);
-        if(status){
-            status.innerText = "⚠️ Iklan tidak terbuka. Izinkan pop-up untuk Syadzz Store lalu klik HITUNG lagi.";
-        }
-        return;
-    }
-
-    // Consume kuota hanya setelah iklan berhasil dibuka.
-    const result = await getCalculatorFreeAccessConsume();
-
-    if(!result.ok || result.allowed !== true){
-        calculatorFreeBusy = false;
-        setCalculatorCalculateButtonState(false);
-
-        try{
-            adWindow.close();
-        }catch(_){}
-
-        const box = document.getElementById("calculatorFreeCooldown");
-        if(box){
-            box.style.display = "block";
-            box.innerText = result.message || "❌ Jatah gratis hanya bisa digunakan 1 kali setiap 2 hari.";
-        }
-
-        if(status) status.innerText = result.message || "❌ Jatah gratis hanya bisa digunakan 1 kali setiap 2 hari.";
-        setCalculatorFreeStatus(false, "TERPAKAI");
-        return;
-    }
-
-    // Simpan hasil di halaman, tetapi sembunyikan sampai countdown selesai.
-    renderCalculatorResult();
-
-    const resultCard = document.getElementById("calculatorResultCard");
-    if(resultCard) resultCard.style.display = "none";
-
-    setCalculatorFreeStatus(false, "TERPAKAI 2 HARI");
-
-    const box = document.getElementById("calculatorFreeCooldown");
-    if(box){
-        box.style.display = "block";
-        box.innerText = "📢 Iklan terbuka. Countdown 120 detik sedang berjalan...";
-    }
-
-    if(status) status.innerText = "⏳ Iklan sudah dibuka. Hasil akan muncul setelah countdown 120 detik.";
-
-    startCalculatorFreeCooldown(CALCULATOR_FREE_COOLDOWN_SECONDS, function(){
-        if(resultCard) resultCard.style.display = "";
-        if(status) status.innerText = "✅ Countdown selesai. Hasil kalkulator sudah tersedia.";
-        calculatorFreeBusy = false;
-        setCalculatorCalculateButtonState(false);
-    });
+    if(status) status.innerText = "Perhitungan berhasil.";
 }
 
 function changePayment(){
