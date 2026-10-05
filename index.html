@@ -4193,7 +4193,17 @@ textarea:focus{
 .topup-field label{display:block;margin-bottom:7px;color:#ddd;font-size:13px;font-weight:800}
 .topup-field input,.topup-field select{width:100%;padding:13px;border-radius:12px;border:1px solid #35354e;background:#0d0d18;color:#fff;outline:none}
 .topup-field input:focus,.topup-field select:focus{border-color:#ffd900}
-.topup-price-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.topup-price-grid{margin-top:12px}
+.topup-price-table-wrap{overflow-x:auto;border:1px solid #35354e;border-radius:14px;background:#11111c}
+.topup-price-table{width:100%;border-collapse:collapse;min-width:420px}
+.topup-price-table th,.topup-price-table td{padding:11px 12px;border-bottom:1px solid #29293b;text-align:left}
+.topup-price-table th{font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;background:#171725}
+.topup-price-table tbody tr{cursor:pointer;transition:.15s}
+.topup-price-table tbody tr:hover{background:rgba(255,217,0,.07)}
+.topup-price-table tbody tr.active{background:rgba(255,217,0,.12);box-shadow:inset 3px 0 0 #ffd900}
+.topup-price-table tbody tr.disabled{opacity:.45;cursor:not-allowed}
+.topup-price-table tbody tr:last-child td{border-bottom:0}
+.topup-table-status{font-size:11px;font-weight:700}
 .topup-price-card{border:1px solid #35354e;background:#11111c;border-radius:14px;padding:12px;text-align:left;cursor:pointer;transition:.18s}
 .topup-price-card:hover{border-color:#ffd900;transform:translateY(-1px)}
 .topup-price-card.active{border-color:#ffd900;background:rgba(255,217,0,.08);box-shadow:0 0 0 1px rgba(255,217,0,.22)}
@@ -4217,7 +4227,7 @@ textarea:focus{
 .topup-error{color:#ff6b7a;font-size:12px;margin-top:8px;min-height:18px}
 .topup-success{color:#00ff88;font-size:12px;margin-top:8px}
 .topup-list-title{font-size:13px;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
-@media(max-width:560px){.topup-price-grid{grid-template-columns:1fr 1fr}.topup-custom-row{grid-template-columns:1fr}.topup-stock{align-items:flex-start;flex-direction:column}.topup-title{font-size:24px}}
+@media(max-width:560px){.topup-price-table{min-width:360px}.topup-price-table th,.topup-price-table td{padding:10px 9px}.topup-custom-row{grid-template-columns:1fr}.topup-stock{align-items:flex-start;flex-direction:column}.topup-title{font-size:24px}}
 </style>
 <style>
 /* ===== GLOBAL MODULE EMOJI MOTION ===== */
@@ -11229,18 +11239,34 @@ function topupCalculatePrice(amount){
 function topupRenderPrices(){
     const grid=document.getElementById("topupPriceGrid");
     if(!grid) return;
-    const active=robuxStoreSettings.active===true && Number(robuxStoreSettings.stock_robux||0)>0;
-    const rows=topupGetPriceRows().filter(function(row){ return row.amount>=50; }).sort(function(a,b){ return a.amount-b.amount; });
 
-    if(!rows.length){
+    const active=robuxStoreSettings.active===true && Number(robuxStoreSettings.stock_robux||0)>0;
+    const stock=Number(robuxStoreSettings.stock_robux||0);
+
+    // Hanya tampilkan beberapa nominal populer agar tabel tidak terlalu panjang.
+    // Harga tetap dihitung otomatis dari daftar harga SYADZZ STORE di database.
+    const presetAmounts=[50,100,250,500,1000,2500,5000];
+    const available=presetAmounts.map(function(amount){
+        const result=topupCalculatePrice(amount);
+        if(!result.ok) return null;
+        return {amount:amount,price:result.total};
+    }).filter(Boolean);
+
+    if(!available.length){
         grid.innerHTML='<div class="topup-muted">Harga Robux belum tersedia.</div>';
         return;
     }
 
-    grid.innerHTML=rows.map(function(row){
-        const disabled=!active || row.amount>Number(robuxStoreSettings.stock_robux||0);
-        return '<button type="button" class="topup-price-card'+(disabled?' disabled':'')+'" '+(disabled?'disabled ':'')+'onclick="selectRobuxAmount('+row.amount+')"><div class="topup-price-rbx">'+row.amount.toLocaleString("id-ID")+' ROBUX</div><div class="topup-price-idr">'+rupiahTopup(row.price)+'</div><div class="topup-price-note">'+(disabled?'Melebihi stok':'Pilih nominal')+'</div></button>';
-    }).join("");
+    grid.innerHTML='<div class="topup-price-table-wrap"><table class="topup-price-table"><thead><tr><th>ROBUX</th><th>HARGA</th><th>STOK</th></tr></thead><tbody>'+
+        available.map(function(row){
+            const disabled=!active || row.amount>stock;
+            return '<tr class="'+(disabled?'disabled':'')+'" '+(!disabled?'onclick="selectRobuxAmount('+row.amount+')"':'')+'>'+
+                '<td><strong>'+row.amount.toLocaleString("id-ID")+' RBX</strong></td>'+
+                '<td><strong>'+rupiahTopup(row.price)+'</strong></td>'+
+                '<td><span class="topup-table-status">'+(disabled?(stock<=0?'HABIS':'MELEBIHI STOK'):'TERSEDIA')+'</span></td>'+
+            '</tr>';
+        }).join('')+
+        '</tbody></table></div>';
 }
 
 function selectRobuxAmount(amount){
@@ -11267,11 +11293,11 @@ function topupAmountChanged(){
     }
     if(msg) msg.innerText=result.parts?.length ? "Patokan harga: "+result.parts.join(" + ") : "";
     if(total) total.innerText=amount.toLocaleString("id-ID")+" RBX · "+rupiahTopup(result.total);
-    document.querySelectorAll(".topup-price-card").forEach(function(card){card.classList.remove("active")});
-    document.querySelectorAll(".topup-price-card").forEach(function(card){
-        const text=card.querySelector(".topup-price-rbx")?.innerText||"";
+    document.querySelectorAll(".topup-price-table tbody tr").forEach(function(row){
+        row.classList.remove("active");
+        const text=row.querySelector("td:first-child")?.innerText||"";
         const n=Number(text.replace(/[^0-9]/g,""));
-        if(n===amount) card.classList.add("active");
+        if(n===amount) row.classList.add("active");
     });
     topupUpdateButton();
 }
