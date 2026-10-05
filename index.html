@@ -11180,6 +11180,17 @@ function topupRenderStock(){
     if(box) box.classList.toggle("off",!active);
 }
 
+function topupGetPriceRows(){
+    return (Array.isArray(robuxStorePrices) ? robuxStorePrices : [])
+        .map(function(row){
+            return { amount:Number(row?.robux_amount || 0), price:Number(row?.price || 0) };
+        })
+        .filter(function(row){
+            return Number.isInteger(row.amount) && row.amount > 0 && row.price >= 0;
+        })
+        .sort(function(a,b){ return b.amount-a.amount; });
+}
+
 function topupCalculatePrice(amount){
     amount=Number(amount||0);
     if(!Number.isInteger(amount) || amount<50){
@@ -11189,37 +11200,46 @@ function topupCalculatePrice(amount){
         return {ok:false,message:"Jumlah Robux melebihi stok yang tersedia."};
     }
 
-    // HARGA TOP UP FIXED — BUKAN DIATUR ADMIN
-    const PRICE_TABLE={
-        10:2000,25:5000,50:10000,75:15000,100:16000,125:21000,
-        150:24000,175:29000,200:32000,225:37000,250:40000,275:45000,
-        300:48000,325:53000,350:56000,375:61000,400:64000,425:69000,
-        450:72000,475:77000,500:78000
-    };
-
-    if(PRICE_TABLE[amount] !== undefined){
-        return {ok:true,total:PRICE_TABLE[amount],parts:[amount+" Robux"]};
+    const rows=topupGetPriceRows();
+    if(!rows.length){
+        return {ok:false,message:"Daftar harga Robux belum berhasil dimuat."};
     }
 
-    return {
-        ok:false,
-        message:"Nominal "+amount.toLocaleString("id-ID")+" Robux belum tersedia. Pilih nominal yang tersedia pada daftar harga."
-    };
+    let remaining=amount;
+    let total=0;
+    const parts=[];
+
+    for(const row of rows){
+        if(row.amount > remaining) continue;
+        const qty=Math.floor(remaining / row.amount);
+        if(qty <= 0) continue;
+        remaining -= qty * row.amount;
+        total += qty * row.price;
+        parts.push(qty === 1 ? row.amount.toLocaleString("id-ID")+" Robux" : qty+" × "+row.amount.toLocaleString("id-ID")+" Robux");
+        if(remaining === 0) break;
+    }
+
+    if(remaining !== 0){
+        return {ok:false,message:"Nominal "+amount.toLocaleString("id-ID")+" Robux belum dapat dihitung dari daftar harga yang tersedia."};
+    }
+
+    return {ok:true,total:total,parts:parts};
 }
 
 function topupRenderPrices(){
     const grid=document.getElementById("topupPriceGrid");
     if(!grid) return;
     const active=robuxStoreSettings.active===true && Number(robuxStoreSettings.stock_robux||0)>0;
-    const PRICE_TABLE={
-        50:10000,75:15000,100:16000,125:21000,150:24000,175:29000,200:32000,225:37000,
-        250:40000,275:45000,300:48000,325:53000,350:56000,375:61000,400:64000,
-        425:69000,450:72000,475:77000,500:78000
-    };
-    grid.innerHTML=Object.entries(PRICE_TABLE).map(([amount,price])=>{
-        amount=Number(amount);
-        const disabled=!active || amount>Number(robuxStoreSettings.stock_robux||0);
-        return '<button type="button" class="topup-price-card'+(disabled?' disabled':'')+'" '+(disabled?'disabled ':'')+'onclick="selectRobuxAmount('+amount+')"><div class="topup-price-rbx">'+amount.toLocaleString("id-ID")+' ROBUX</div><div class="topup-price-idr">'+rupiahTopup(price)+'</div><div class="topup-price-note">'+(disabled?'Melebihi stok':'Pilih nominal')+'</div></button>';
+    const rows=topupGetPriceRows().filter(function(row){ return row.amount>=50; }).sort(function(a,b){ return a.amount-b.amount; });
+
+    if(!rows.length){
+        grid.innerHTML='<div class="topup-muted">Harga Robux belum tersedia.</div>';
+        return;
+    }
+
+    grid.innerHTML=rows.map(function(row){
+        const disabled=!active || row.amount>Number(robuxStoreSettings.stock_robux||0);
+        return '<button type="button" class="topup-price-card'+(disabled?' disabled':'')+'" '+(disabled?'disabled ':'')+'onclick="selectRobuxAmount('+row.amount+')"><div class="topup-price-rbx">'+row.amount.toLocaleString("id-ID")+' ROBUX</div><div class="topup-price-idr">'+rupiahTopup(row.price)+'</div><div class="topup-price-note">'+(disabled?'Melebihi stok':'Pilih nominal')+'</div></button>';
     }).join("");
 }
 
@@ -11309,11 +11329,24 @@ async function loadRobuxStore(){
     if(robuxStoreLoading) return;
     robuxStoreLoading=true;
     try{
+        // Database saat ini: get_robux_store_v1() -> TABLE(active boolean, stock bigint).
         const {data,error}=await supabaseClient.rpc("get_robux_store_v1");
         if(error) throw error;
-        const result=Array.isArray(data)?data[0]:data;
-        robuxStoreSettings=result?.settings || {active:false,stock_robux:0};
-        robuxStorePrices=result?.prices || [];
+
+        const result=Array.isArray(data) ? data[0] : data;
+        robuxStoreSettings={
+            active:result?.active===true,
+            stock_robux:Number(result?.stock||0)
+        };
+
+        // Database saat ini: robux_prices(robux_amount integer, price bigint).
+        const {data:prices,error:priceError}=await supabaseClient
+            .from("robux_prices")
+            .select("robux_amount, price")
+            .order("robux_amount",{ascending:true});
+        if(priceError) throw priceError;
+
+        robuxStorePrices=Array.isArray(prices) ? prices : [];
         robuxStoreLoaded=true;
         topupRenderStock();
         topupRenderPrices();
@@ -11323,8 +11356,11 @@ async function loadRobuxStore(){
     }catch(error){
         console.error("Robux store load error:",error);
         topupSetMessage("Gagal memuat Top Up Robux: "+(error.message||"Error"),false);
-        const value=document.getElementById("topupStockValue"); if(value) value.innerText="GAGAL MEMUAT";
-    }finally{ robuxStoreLoading=false; }
+        const value=document.getElementById("topupStockValue");
+        if(value) value.innerText="GAGAL MEMUAT";
+    }finally{
+        robuxStoreLoading=false;
+    }
 }
 
 async function submitRobuxTopup(){
