@@ -11285,18 +11285,32 @@ function topupGetPriceRows(){
 // Perhitungan berlaku untuk semua jumlah Robux, termasuk jumlah custom.
 const TOPUP_BASE_PRICE_PER_ROBUX = 200;
 
-// Harga per Robux makin murah ketika jumlah pembelian makin besar.
-// Batas terendah tetap Rp156 / Robux.
-function topupUnitPrice(amount){
-    amount=Number(amount||0);
-    if(amount >= 5000) return 156;
-    if(amount >= 2500) return 170;
-    if(amount >= 1000) return 180;
-    if(amount >= 500) return 185;
-    if(amount >= 250) return 190;
-    if(amount >= 100) return 195;
-    return 200;
-}
+// Harga jual mengikuti price list Apepbux yang diberikan customer.
+// Harga per-RBX tidak ditampilkan ke customer.
+// Jika customer membeli SELURUH stok yang tersedia, harga khusus = Rp156/RBX.
+const TOPUP_PRICE_LIST = {
+    10: 2000,
+    25: 5000,
+    50: 10000,
+    75: 15000,
+    100: 16000,
+    125: 21000,
+    150: 24000,
+    175: 29000,
+    200: 32000,
+    225: 37000,
+    250: 40000,
+    275: 45000,
+    300: 48000,
+    325: 53000,
+    350: 56000,
+    375: 61000,
+    400: 64000,
+    425: 69000,
+    450: 72000,
+    475: 77000,
+    500: 78000
+};
 
 function topupCalculatePrice(amount){
     amount=Number(amount||0);
@@ -11304,17 +11318,65 @@ function topupCalculatePrice(amount){
         return {ok:false,message:"Minimal pembelian adalah 50 Robux."};
     }
 
-    const unitPrice=topupUnitPrice(amount);
-    const total=amount*unitPrice;
-    const baseTotal=amount*TOPUP_BASE_PRICE_PER_ROBUX;
+    const stock=Number(robuxStoreSettings.stock_robux||0);
+
+    // Beli seluruh stok = Rp156 per Robux.
+    if(stock>0 && amount===stock){
+        const total=amount*156;
+        return {
+            ok:true,
+            total:total,
+            unitPrice:156,
+            baseTotal:amount*TOPUP_BASE_PRICE_PER_ROBUX,
+            discountPercent:Math.round((1-(156/TOPUP_BASE_PRICE_PER_ROBUX))*100),
+            parts:[amount.toLocaleString("id-ID")+" Robux"]
+        };
+    }
+
+    // Nominal yang persis ada di price list.
+    if(Object.prototype.hasOwnProperty.call(TOPUP_PRICE_LIST,amount)){
+        const total=TOPUP_PRICE_LIST[amount];
+        return {
+            ok:true,
+            total:total,
+            unitPrice:total/amount,
+            baseTotal:amount*TOPUP_BASE_PRICE_PER_ROBUX,
+            discountPercent:Math.round((1-(total/amount/TOPUP_BASE_PRICE_PER_ROBUX))*100),
+            parts:[amount.toLocaleString("id-ID")+" Robux"]
+        };
+    }
+
+    // Nominal custom dihitung dari pecahan price list terbesar yang tersedia.
+    let remaining=amount;
+    let total=0;
+    const parts=[];
+    const denominations=Object.keys(TOPUP_PRICE_LIST).map(Number).sort((a,b)=>b-a);
+
+    for(const denomination of denominations){
+        const qty=Math.floor(remaining/denomination);
+        if(qty<=0) continue;
+        remaining-=qty*denomination;
+        total+=qty*TOPUP_PRICE_LIST[denomination];
+        parts.push(qty===1
+            ? denomination.toLocaleString("id-ID")+" Robux"
+            : qty+" × "+denomination.toLocaleString("id-ID")+" Robux");
+        if(remaining===0) break;
+    }
+
+    if(remaining!==0){
+        return {
+            ok:false,
+            message:"Nominal tersebut belum dapat dihitung dari price list yang tersedia."
+        };
+    }
 
     return {
         ok:true,
         total:total,
-        unitPrice:unitPrice,
-        baseTotal:baseTotal,
-        discountPercent:Math.round((1-(unitPrice/TOPUP_BASE_PRICE_PER_ROBUX))*100),
-        parts:[amount.toLocaleString("id-ID")+" Robux × Rp"+unitPrice.toLocaleString("id-ID")]
+        unitPrice:total/amount,
+        baseTotal:amount*TOPUP_BASE_PRICE_PER_ROBUX,
+        discountPercent:Math.round((1-(total/amount/TOPUP_BASE_PRICE_PER_ROBUX))*100),
+        parts:parts
     };
 }
 
@@ -11326,7 +11388,7 @@ function topupRenderPrices(){
     const stock=Number(robuxStoreSettings.stock_robux||0);
 
     // Tampilan dibuat seperti kartu pilihan Robux: ringkas, bergambar, dan tidak terlalu banyak pilihan.
-    const presetAmounts=[50,100,250,500,1000,2500,5000];
+    const presetAmounts=[50,75,100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500];
     const available=presetAmounts.map(function(amount){
         const result=topupCalculatePrice(amount);
         if(!result.ok) return null;
@@ -11534,12 +11596,24 @@ async function loadRobuxStore(){
         if(!robuxStorePrices.length){
             robuxStorePrices=[
                 {robux_amount:50,price:10000},
-                {robux_amount:100,price:20000},
-                {robux_amount:250,price:50000},
-                {robux_amount:500,price:100000},
-                {robux_amount:1000,price:200000},
-                {robux_amount:2500,price:500000},
-                {robux_amount:5000,price:1000000}
+                {robux_amount:75,price:15000},
+                {robux_amount:100,price:16000},
+                {robux_amount:125,price:21000},
+                {robux_amount:150,price:24000},
+                {robux_amount:175,price:29000},
+                {robux_amount:200,price:32000},
+                {robux_amount:225,price:37000},
+                {robux_amount:250,price:40000},
+                {robux_amount:275,price:45000},
+                {robux_amount:300,price:48000},
+                {robux_amount:325,price:53000},
+                {robux_amount:350,price:56000},
+                {robux_amount:375,price:61000},
+                {robux_amount:400,price:64000},
+                {robux_amount:425,price:69000},
+                {robux_amount:450,price:72000},
+                {robux_amount:475,price:77000},
+                {robux_amount:500,price:78000}
             ];
         }
 
