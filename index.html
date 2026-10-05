@@ -4284,6 +4284,16 @@ textarea:focus{
 @keyframes syadzzEmojiFloat{0%,100%{transform:translateY(0) rotate(0) scale(1);filter:drop-shadow(0 0 0 rgba(255,217,0,0))}25%{transform:translateY(-4px) rotate(-3deg) scale(1.04)}50%{transform:translateY(0) rotate(0) scale(1.08);filter:drop-shadow(0 0 8px rgba(255,217,0,.22))}75%{transform:translateY(-3px) rotate(3deg) scale(1.04)}}
 @media(prefers-reduced-motion:reduce){.game-module-card .choice-icon,.service-choice-card .choice-icon,#homePage .choice-card .choice-icon{animation:none}}
 </style>
+
+<style>
+.topup-warning-elegant{border:1px solid rgba(255,193,7,.28);background:linear-gradient(135deg,rgba(255,193,7,.10),rgba(255,255,255,.025));border-radius:18px;padding:16px;margin:14px 0;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.topup-warning-elegant .warning-head{display:flex;align-items:center;gap:10px;font-weight:900;color:#ffd54a;font-size:14px;margin-bottom:8px}
+.topup-warning-elegant .warning-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:rgba(255,193,7,.14);font-size:18px}
+.topup-warning-elegant .warning-text{font-size:12px;line-height:1.65;color:#d7d7df}
+.topup-warning-elegant .warning-check{display:flex;align-items:flex-start;gap:10px;margin-top:13px;padding:11px 12px;border-radius:12px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.07);cursor:pointer}
+.topup-warning-elegant .warning-check input{margin-top:3px;accent-color:#ffd900}
+.topup-warning-elegant .warning-check span{font-size:12px;color:#eee;line-height:1.5}
+</style>
 </head>
 <body>
 <div class="maintenance-screen" id="maintenanceScreen">
@@ -4827,7 +4837,7 @@ textarea:focus{
 <div><div class="topup-stock-label">Stok Robux Tersedia</div><div class="topup-stock-value" id="topupStockValue">Memuat...</div></div>
 <div class="topup-status-badge" id="topupStockStatus">MEMUAT</div>
 </div>
-<div class="topup-warning">
+<div class="topup-warning topup-warning-elegant">
 <div class="topup-warning-head"><div class="topup-warning-icon">⚠️</div><div class="topup-warning-title">PERINGATAN PENTING</div></div>
 <div class="topup-warning-text">Pastikan kamu memasukkan <strong>username Roblox yang benar</strong> dan akun yang digunakan memenuhi persyaratan layanan. SYADZZ STORE tidak bertanggung jawab atas kendala yang terjadi apabila customer tetap melakukan order dengan akun yang tidak memenuhi persyaratan tersebut.</div>
 <label class="topup-warning-check"><input type="checkbox" id="topupAgeConfirm"><span>Saya sudah membaca dan memahami peringatan tersebut.</span></label>
@@ -4846,7 +4856,7 @@ textarea:focus{
 </div>
 <div class="topup-error" id="topupPriceMessage"></div>
 </div>
-<div class="topup-total"><span>TOTAL ROBUX / HARGA</span><strong id="topupTotalValue">0 RBX · Rp0</strong></div>
+<div class="topup-total"><span>TOTAL HARGA</span><strong id="topupTotalValue">Rp0</strong></div>
 </div>
 
 <div class="topup-card">
@@ -11366,17 +11376,17 @@ function topupAmountChanged(){
     const stock=Number(robuxStoreSettings.stock_robux||0);
     if(!result.ok){
         if(msg) msg.innerText=result.message;
-        if(total) total.innerText="0 RBX · Rp0";
+        if(total) total.innerText="Rp0";
         topupUpdateButton();
         return;
     }
     if(msg){
-        msg.innerText=result.parts?.length ? "Patokan harga: "+result.parts.join(" + ") : "";
+        msg.innerText="";
         if(stock>0 && amount>stock){
             msg.innerText="Jumlah melebihi stok tersedia ("+stock.toLocaleString("id-ID")+" RBX).";
         }
     }
-    if(total) total.innerText=amount.toLocaleString("id-ID")+" RBX · "+rupiahTopup(result.total);
+    if(total) total.innerText=rupiahTopup(result.total);
     document.querySelectorAll(".topup-price-card").forEach(function(row){
         row.classList.remove("active");
         const text=row.querySelector(".topup-price-card-top span:last-child")?.innerText||"";
