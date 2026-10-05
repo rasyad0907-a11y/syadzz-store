@@ -11242,9 +11242,9 @@ function topupGetPriceRows(){
         .sort(function(a,b){ return b.amount-a.amount; });
 }
 
-// Harga tetap SYADZZ STORE: 1 Robux = Rp156.
+// Harga tetap SYADZZ STORE: 1 Robux = Rp200.
 // Perhitungan berlaku untuk semua jumlah Robux, termasuk jumlah custom.
-const TOPUP_PRICE_PER_ROBUX = 156;
+const TOPUP_PRICE_PER_ROBUX = 200;
 
 function topupCalculatePrice(amount){
     amount=Number(amount||0);
@@ -11415,10 +11415,26 @@ async function loadRobuxStore(){
         const storeRequest=await supabaseClient.rpc("get_robux_store_v1");
         if(storeRequest.error) throw storeRequest.error;
 
-        const storeData=Array.isArray(storeRequest.data) ? storeRequest.data[0] : storeRequest.data;
+        const rawStoreData=Array.isArray(storeRequest.data) ? storeRequest.data[0] : storeRequest.data;
+
+        // Database Top Up pernah memiliki 2 bentuk return: row langsung
+        // {active, stock} dan JSON {settings:{active, stock_robux}}.
+        // Terima keduanya supaya stok admin selalu terbaca di customer.
+        const storeSettings = rawStoreData?.settings || rawStoreData || {};
+        const liveStock =
+            storeSettings.stock_robux ??
+            storeSettings.stock ??
+            rawStoreData?.stock_robux ??
+            rawStoreData?.stock ??
+            0;
+        const liveActive =
+            storeSettings.active ??
+            rawStoreData?.active ??
+            false;
+
         robuxStoreSettings={
-            active:storeData?.active===true,
-            stock_robux:Number(storeData?.stock ?? 0)
+            active:liveActive===true,
+            stock_robux:Number(liveStock)||0
         };
 
         // Ambil harga langsung dari tabel yang memang dipakai database sekarang:
@@ -11455,13 +11471,13 @@ async function loadRobuxStore(){
         // patokan SYADZZ STORE, sedangkan status stok ditandai gagal dimuat.
         if(!robuxStorePrices.length){
             robuxStorePrices=[
-                {robux_amount:50,price:7800},
-                {robux_amount:100,price:15600},
-                {robux_amount:250,price:39000},
-                {robux_amount:500,price:78000},
-                {robux_amount:1000,price:156000},
-                {robux_amount:2500,price:390000},
-                {robux_amount:5000,price:780000}
+                {robux_amount:50,price:10000},
+                {robux_amount:100,price:20000},
+                {robux_amount:250,price:50000},
+                {robux_amount:500,price:100000},
+                {robux_amount:1000,price:200000},
+                {robux_amount:2500,price:500000},
+                {robux_amount:5000,price:1000000}
             ];
         }
 
