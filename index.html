@@ -4068,6 +4068,20 @@ textarea:focus{
 .calculator-free-count{font-weight:900;color:#8dffc6;font-size:12px;}
 .calculator-free-count.used{color:#ff9aaa;}
 .calculator-free-cooldown{margin-top:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,217,0,.35);background:rgba(255,217,0,.05);color:#ffe866;font-size:12px;line-height:1.5;text-align:center;}
+.calculator-follow-overlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(5,5,12,.78);backdrop-filter:blur(10px);}
+.calculator-follow-modal{width:min(430px,100%);border:1px solid rgba(255,217,0,.28);border-radius:24px;background:linear-gradient(145deg,#181820,#0e0e14);box-shadow:0 24px 80px rgba(0,0,0,.55);padding:24px;text-align:center;color:#fff;}
+.calculator-follow-icon{width:64px;height:64px;margin:0 auto 14px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:31px;background:linear-gradient(135deg,#ff0050,#00f2ea);box-shadow:0 10px 30px rgba(255,0,80,.18);}
+.calculator-follow-title{font-size:22px;font-weight:950;letter-spacing:.3px;}
+.calculator-follow-subtitle{margin:8px auto 18px;max-width:340px;color:#bdbdce;font-size:12px;line-height:1.7;}
+.calculator-follow-step{display:flex;gap:11px;text-align:left;align-items:flex-start;margin:10px 0;padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);}
+.calculator-follow-step-num{min-width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#ffd900;color:#111;font-size:12px;font-weight:950;}
+.calculator-follow-step-text{font-size:11px;line-height:1.55;color:#d8d8e5;}
+.calculator-follow-btn{width:100%;border:0;border-radius:14px;padding:13px 16px;margin-top:9px;font-weight:950;font-size:12px;cursor:pointer;}
+.calculator-follow-primary{background:linear-gradient(135deg,#ffd900,#ffb800);color:#111;}
+.calculator-follow-secondary{background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(255,255,255,.1);}
+.calculator-follow-countdown{margin:14px 0 4px;font-size:42px;line-height:1;font-weight:1000;color:#ffd900;letter-spacing:1px;}
+.calculator-follow-countdown-label{font-size:10px;color:#9696aa;letter-spacing:1.4px;font-weight:800;}
+.calculator-follow-status{min-height:18px;margin-top:10px;font-size:11px;color:#bdbdce;line-height:1.5;}
 .calculator-plan-note{font-size:10px;color:#8c8ca4;line-height:1.5;}
 @media(max-width:650px){.calculator-plan-grid{grid-template-columns:1fr;}}
 .calculator-access-card{position:relative;overflow:hidden;}
@@ -4632,7 +4646,7 @@ textarea:focus{
 <span class="faq-number">59</span>
 <span>🔵 Login Google gagal — Apa yang harus saya lakukan?</span>
 </button>
-<button class="faq-question-row" data-answer="🧮 SETELAH LOGIN: Pilih GRATIS untuk menggunakan akses Free sesuai batas yang tampil, atau pilih PREMIUM jika ingin akses permanen tanpa iklan. Pada mode GRATIS, klik HITUNG untuk membuka iklan, lalu hasil perhitungan langsung muncul setelah iklan berhasil dibuka." data-category="ACCOUNT" data-number="60" onclick="openFaqChat(this,event)" type="button">
+<button class="faq-question-row" data-answer="🧮 SETELAH LOGIN: Pilih GRATIS untuk menggunakan akses Free sesuai batas yang tampil, atau pilih PREMIUM jika ingin akses permanen tanpa batas. Pada mode GRATIS, klik HITUNG, Follow TikTok @syadzz011, kembali ke website, tunggu countdown 60 detik, lalu hasil perhitungan muncul otomatis." data-category="ACCOUNT" data-number="60" onclick="openFaqChat(this,event)" type="button">
 <span class="faq-number">60</span>
 <span>🧮 Setelah login — Bagaimana cara mulai menggunakan kalkulator?</span>
 </button>
@@ -4690,7 +4704,7 @@ Pilih akun Google yang ingin digunakan untuk Kalkulator Speed.
 <div class="calculator-plan-grid">
 <button id="calculatorFreePlanBtn" class="calculator-plan-btn" type="button" onclick="selectCalculatorPlan('free')">
 <span class="plan-title">🆓 GRATIS</span>
-<span class="plan-sub">1 kali hitung setiap 2 hari • iklan.</span>
+<span class="plan-sub">1 kali hitung setiap 2 hari • Follow TikTok + tunggu 60 detik.</span>
 </button>
 <button id="calculatorPremiumPlanBtn" class="calculator-plan-btn" type="button" onclick="selectCalculatorPlan('premium')">
 <span class="plan-title">👑 PREMIUM</span>
@@ -4702,7 +4716,27 @@ Pilih akun Google yang ingin digunakan untuk Kalkulator Speed.
 <span id="calculatorFreeCount" class="calculator-free-count">MEMERIKSA...</span>
 </div>
 <div id="calculatorFreeCooldown" class="calculator-free-cooldown" style="display:none;"></div>
-<div class="calculator-plan-note" style="margin-top:8px;">Gratis bisa digunakan 1 kali setiap 2 hari. Klik HITUNG untuk membuka iklan, lalu hasil kalkulator langsung ditampilkan.</div>
+<div id="calculatorFollowOverlay" class="calculator-follow-overlay" aria-hidden="true">
+<div class="calculator-follow-modal" role="dialog" aria-modal="true" aria-labelledby="calculatorFollowTitle">
+<div class="calculator-follow-icon">♪</div>
+<div id="calculatorFollowTitle" class="calculator-follow-title">Satu langkah lagi ✨</div>
+<div class="calculator-follow-subtitle">Untuk memakai Kalkulator Speed GRATIS, bantu support <strong>@syadzz011</strong> di TikTok. Setelah kembali ke website, tunggu 60 detik lalu hasil akan muncul otomatis.</div>
+<div id="calculatorFollowSteps">
+<div class="calculator-follow-step"><div class="calculator-follow-step-num">1</div><div class="calculator-follow-step-text"><strong>Follow TikTok SYADZZ</strong><br>Tekan tombol di bawah untuk membuka TikTok.</div></div>
+<div class="calculator-follow-step"><div class="calculator-follow-step-num">2</div><div class="calculator-follow-step-text"><strong>Kembali ke website</strong><br>Setelah selesai Follow, kembali ke tab SYADZZ STORE.</div></div>
+<div class="calculator-follow-step"><div class="calculator-follow-step-num">3</div><div class="calculator-follow-step-text"><strong>Tunggu 60 detik</strong><br>Countdown akan berjalan sampai 0 dan hasil langsung ditampilkan.</div></div>
+</div>
+<div id="calculatorFollowCountdown" style="display:none;">
+<div class="calculator-follow-countdown" id="calculatorFollowSeconds">60</div>
+<div class="calculator-follow-countdown-label">MENUNGGU SEBELUM HASIL DITAMPILKAN</div>
+</div>
+<button id="calculatorFollowButton" class="calculator-follow-btn calculator-follow-primary" type="button">♪ FOLLOW TIKTOK @SYADZZ011</button>
+<button id="calculatorFollowResumeButton" class="calculator-follow-btn calculator-follow-secondary" type="button" style="display:none;">✓ SAYA SUDAH KEMBALI — MULAI COUNTDOWN</button>
+<div id="calculatorFollowStatus" class="calculator-follow-status">Klik Follow untuk membuka TikTok.</div>
+</div>
+</div>
+
+<div class="calculator-plan-note" style="margin-top:8px;">Gratis bisa digunakan 1 kali setiap 2 hari. Follow TikTok, kembali ke website, tunggu countdown 60 detik, lalu hasil kalkulator ditampilkan.</div>
 </div>
 
 <div id="calculatorAccessGranted" style="display:none;">
@@ -5167,7 +5201,9 @@ let calculatorPremiumActive = false;
 let calculatorFreeBusy = false;
 let calculatorFreeReady = false;
 const CALCULATOR_FREE_DAYS = 2;
-const CALCULATOR_FREE_AD_URL = "https://bony-teaching.com/7XrmVI";
+const CALCULATOR_TIKTOK_URL = "https://www.tiktok.com/@syadzz011";
+let calculatorFollowWaitingForReturn = false;
+let calculatorFollowCountdownTimer = null;
 const CALCULATOR_SOFT_LOGIN_KEY = "syadzz_calculator_email";
 const CALCULATOR_SOFT_LOGOUT_KEY = "syadzz_calculator_logged_out";
 
@@ -5215,18 +5251,134 @@ function setCalculatorCalculateButtonState(ready){
 }
 
 function stopCalculatorFreeCooldown(){
-    // Countdown kalkulator GRATIS sudah dihapus.
     try{ localStorage.removeItem("syadzz_calculator_free_ad_cooldown_until"); }catch(_){}
+    if(calculatorFollowCountdownTimer){ clearInterval(calculatorFollowCountdownTimer); calculatorFollowCountdownTimer=null; }
 }
 
 function restoreCalculatorFreeAdCooldown(){
-    // Bersihkan sisa countdown lama dari versi sebelumnya.
+    // Versi baru tidak memakai iklan/cooldown lama.
     stopCalculatorFreeCooldown();
 }
 
-document.addEventListener("visibilitychange", function(){
-    if(!document.hidden){ restoreCalculatorFreeAdCooldown(); }
+function showCalculatorFollowGate(){
+    const overlay=document.getElementById("calculatorFollowOverlay");
+    const steps=document.getElementById("calculatorFollowSteps");
+    const countdown=document.getElementById("calculatorFollowCountdown");
+    const followBtn=document.getElementById("calculatorFollowButton");
+    const resumeBtn=document.getElementById("calculatorFollowResumeButton");
+    const status=document.getElementById("calculatorFollowStatus");
+    if(!overlay) return;
+    overlay.style.display="flex";
+    overlay.setAttribute("aria-hidden","false");
+    if(steps) steps.style.display="block";
+    if(countdown) countdown.style.display="none";
+    if(followBtn) followBtn.style.display="block";
+    if(resumeBtn) resumeBtn.style.display="none";
+    if(status) status.innerText="Klik Follow untuk membuka TikTok.";
+}
+
+function hideCalculatorFollowGate(){
+    const overlay=document.getElementById("calculatorFollowOverlay");
+    if(overlay){ overlay.style.display="none"; overlay.setAttribute("aria-hidden","true"); }
+}
+
+function startCalculatorFollowCountdown(){
+    if(calculatorFreeBusy && calculatorFollowCountdownTimer) return;
+    const steps=document.getElementById("calculatorFollowSteps");
+    const countdown=document.getElementById("calculatorFollowCountdown");
+    const followBtn=document.getElementById("calculatorFollowButton");
+    const resumeBtn=document.getElementById("calculatorFollowResumeButton");
+    const status=document.getElementById("calculatorFollowStatus");
+    const secondsEl=document.getElementById("calculatorFollowSeconds");
+    if(steps) steps.style.display="none";
+    if(countdown) countdown.style.display="block";
+    if(followBtn) followBtn.style.display="none";
+    if(resumeBtn) resumeBtn.style.display="none";
+    if(status) status.innerText="Countdown berjalan. Jangan tutup halaman sampai selesai.";
+    calculatorFollowWaitingForReturn=false;
+    let seconds=60;
+    if(secondsEl) secondsEl.innerText=seconds;
+    calculatorFollowCountdownTimer=setInterval(async ()=>{
+        if(document.hidden) return;
+        seconds--;
+        if(secondsEl) secondsEl.innerText=seconds;
+        if(seconds<=0){
+            clearInterval(calculatorFollowCountdownTimer);
+            calculatorFollowCountdownTimer=null;
+            if(status) status.innerText="Memproses akses GRATIS dan menampilkan hasil...";
+            await finishCalculatorFreeFlow();
+        }
+    },1000);
+}
+
+async function finishCalculatorFreeFlow(){
+    const status=document.getElementById("dataStatus");
+    const resultCard=document.getElementById("calculatorResultCard");
+    const consumed=await getCalculatorFreeAccessConsume();
+    if(!consumed || consumed.ok!==true || consumed.allowed!==true){
+        calculatorFreeBusy=false;
+        calculatorFollowWaitingForReturn=false;
+        hideCalculatorFollowGate();
+        setCalculatorFreeStatus(false,"TERPAKAI 2 HARI");
+        if(status) status.innerText=consumed?.message || "⚠️ Jatah GRATIS tidak dapat digunakan.";
+        return;
+    }
+    try{
+        await runCalculatorNow();
+        if(resultCard) resultCard.style.display="";
+        calculatorFreeBusy=false;
+        calculatorFreeReady=false;
+        setCalculatorCalculateButtonState(false);
+        setCalculatorFreeStatus(false,"TERPAKAI 2 HARI");
+        hideCalculatorFollowGate();
+        const box=document.getElementById("calculatorFreeCooldown");
+        if(box){ box.style.display="block"; box.innerText="✅ Hasil berhasil dihitung. Jatah GRATIS berikutnya tersedia setelah 2 hari."; }
+        if(status) status.innerText="✅ Perhitungan selesai. Hasil kalkulator sudah ditampilkan.";
+    }catch(error){
+        console.error("Calculator calculation error:",error);
+        calculatorFreeBusy=false;
+        hideCalculatorFollowGate();
+        if(status) status.innerText="❌ Gagal menghitung. Silakan cek input kalkulator.";
+    }
+}
+
+function setupCalculatorFollowGate(){
+    const followBtn=document.getElementById("calculatorFollowButton");
+    const resumeBtn=document.getElementById("calculatorFollowResumeButton");
+    if(followBtn && !followBtn.dataset.bound){
+        followBtn.dataset.bound="1";
+        followBtn.addEventListener("click",()=>{
+            calculatorFollowWaitingForReturn=true;
+            const status=document.getElementById("calculatorFollowStatus");
+            if(status) status.innerText="TikTok dibuka. Setelah selesai Follow, kembali ke SYADZZ STORE.";
+            const w=window.open(CALCULATOR_TIKTOK_URL,"_blank","noopener,noreferrer");
+            if(!w && status) status.innerText="⚠️ TikTok diblokir browser. Izinkan pop-up lalu tekan tombol Follow lagi.";
+            if(resumeBtn) resumeBtn.style.display="block";
+        });
+    }
+    if(resumeBtn && !resumeBtn.dataset.bound){
+        resumeBtn.dataset.bound="1";
+        resumeBtn.addEventListener("click",()=>{
+            if(!calculatorFollowWaitingForReturn){
+                startCalculatorFollowCountdown();
+                return;
+            }
+            startCalculatorFollowCountdown();
+        });
+    }
+}
+
+document.addEventListener("visibilitychange",()=>{
+    if(!document.hidden && calculatorFollowWaitingForReturn && calculatorFreeBusy){
+        startCalculatorFollowCountdown();
+    }
 });
+window.addEventListener("pageshow",()=>{
+    if(calculatorFollowWaitingForReturn && calculatorFreeBusy){
+        startCalculatorFollowCountdown();
+    }
+});
+setupCalculatorFollowGate();
 
 async function getCalculatorFreeAccess(){
     try{
@@ -5266,7 +5418,7 @@ async function refreshCalculatorFreeStatus(){
             const box = document.getElementById("calculatorFreeCooldown");
             if(box){
                 box.style.display = "block";
-                box.innerText = "📢 Klik HITUNG untuk membuka iklan, lalu hasil kalkulator langsung ditampilkan.";
+                box.innerText = "🎵 Klik HITUNG, Follow TikTok @syadzz011, kembali ke website, lalu tunggu countdown 60 detik.";
             }
         }else{
             stopCalculatorFreeCooldown();
@@ -8752,178 +8904,74 @@ async function getCalculatorFreeAccessConsume(){
 }
 
 async function hitung(){
-
-    const status = document.getElementById("dataStatus");
-
-    // =========================
-    // CEK LOGIN
-    // =========================
+    const status=document.getElementById("dataStatus");
     if(!calculatorAccessUser){
-        if(status){
-            status.innerText = "🔒 Login terlebih dahulu untuk menggunakan kalkulator.";
-        }
+        if(status) status.innerText="🔒 Login terlebih dahulu untuk menggunakan kalkulator.";
         await loadCalculatorAccess();
         return;
     }
 
-    // =========================
-    // PREMIUM
-    // =========================
-    // Premium selalu langsung menghitung. Tidak melewati iklan / kuota Free.
     if(calculatorPremiumActive){
-        calculatorPlan = "premium";
+        calculatorPlan="premium";
         setCalculatorPlanButtons();
-        calculatorFreeBusy = false;
+        calculatorFreeBusy=false;
         setCalculatorCalculateButtonState(true);
-
         return runCalculatorNow();
     }
 
-    // =========================
-    // FREE
-    // =========================
-    calculatorPlan = "free";
+    calculatorPlan="free";
     setCalculatorPlanButtons();
-
     if(calculatorFreeBusy){
-        if(status) status.innerText = "⏳ Countdown masih berjalan. Tunggu sampai 0.";
+        if(status) status.innerText="⏳ Proses GRATIS sedang berjalan. Selesaikan Follow dan tunggu countdown sampai 0.";
         return;
     }
 
-    // Cek ulang ke Supabase agar status kuota selalu terbaru.
-    const access = await getCalculatorFreeAccess();
-
-    if(!access || access.ok === false){
-        if(status){
-            status.innerText = access?.message || "❌ Gagal mengecek jatah GRATIS.";
-        }
+    const access=await getCalculatorFreeAccess();
+    if(!access || access.ok===false){
+        if(status) status.innerText=access?.message || "❌ Gagal mengecek jatah GRATIS.";
         return;
     }
-
-    if(access.available !== true){
-        calculatorFreeReady = false;
-        setCalculatorFreeStatus(false, "TERPAKAI 2 HARI");
+    if(access.available!==true){
+        calculatorFreeReady=false;
+        setCalculatorFreeStatus(false,"TERPAKAI 2 HARI");
         setCalculatorCalculateButtonState(false);
-
-        const box = document.getElementById("calculatorFreeCooldown");
+        const box=document.getElementById("calculatorFreeCooldown");
         if(box){
-            box.style.display = "block";
-            box.innerText = access.next_available_at
-                ? "⏳ Jatah GRATIS dapat digunakan kembali " + new Date(access.next_available_at).toLocaleString("id-ID", {timeZone:"Asia/Jakarta"}) + "."
+            box.style.display="block";
+            box.innerText=access.next_available_at
+                ? "⏳ Jatah GRATIS berikutnya tersedia " + new Date(access.next_available_at).toLocaleString("id-ID",{timeZone:"Asia/Jakarta"}) + "."
                 : "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
         }
-
-        if(status){
-            status.innerText = "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
-        }
+        if(status) status.innerText="⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
         return;
     }
 
-    calculatorFreeReady = true;
-    calculatorFreeBusy = true;
+    calculatorFreeReady=true;
+    calculatorFreeBusy=true;
     setCalculatorCalculateButtonState(false);
-
-    // =========================
-    // BUKA IKLAN
-    // =========================
-    if(status) status.innerText = "📢 Membuka iklan...";
-
-    const adWindow = window.open(
-        CALCULATOR_FREE_AD_URL,
-        "_blank",
-        "noopener,noreferrer"
-    );
-
-    if(!adWindow){
-        calculatorFreeBusy = false;
-        calculatorFreeReady = true;
-        setCalculatorCalculateButtonState(true);
-        if(status){
-            status.innerText = "⚠️ Iklan diblokir browser. Izinkan pop-up lalu klik HITUNG lagi.";
-        }
-        return;
-    }
-
-    // =========================
-    // KONSUMSI KUOTA
-    // =========================
-    const consumed = await getCalculatorFreeAccessConsume();
-
-    if(!consumed || consumed.ok !== true || consumed.allowed !== true){
-        calculatorFreeBusy = false;
-        calculatorFreeReady = false;
-        setCalculatorCalculateButtonState(false);
-
-        try{ adWindow.close(); }catch(_){}
-
-        const message = consumed?.message || "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
-
-        setCalculatorFreeStatus(false, "TERPAKAI 2 HARI");
-
-        const box = document.getElementById("calculatorFreeCooldown");
-        if(box){
-            box.style.display = "block";
-            box.innerText = message;
-        }
-
-        if(status) status.innerText = message;
-        return;
-    }
-
-    // Kuota berhasil dipakai. Hitung dan langsung tampilkan hasil.
-    calculatorFreeReady = false;
-    calculatorFreeBusy = true;
-    setCalculatorFreeStatus(false, "TERPAKAI 2 HARI");
-
-    const resultCard = document.getElementById("calculatorResultCard");
-    if(resultCard) resultCard.style.display = "none";
-
-    try{
-        await runCalculatorNow();
-        if(resultCard) resultCard.style.display = "";
-        calculatorFreeBusy = false;
-        calculatorFreeReady = false;
-        setCalculatorCalculateButtonState(false);
-        const box = document.getElementById("calculatorFreeCooldown");
-        if(box){ box.style.display = "none"; box.innerText = ""; }
-        if(status){ status.innerText = "✅ Perhitungan selesai. Hasil kalkulator sudah ditampilkan."; }
-    }catch(error){
-        console.error("Calculator calculation error:", error);
-        calculatorFreeBusy = false;
-        if(status) status.innerText = "❌ Gagal menghitung. Silakan cek input kalkulator.";
-    }
+    const resultCard=document.getElementById("calculatorResultCard");
+    if(resultCard) resultCard.style.display="none";
+    showCalculatorFollowGate();
+    if(status) status.innerText="🎵 Follow TikTok terlebih dahulu, lalu kembali ke website untuk memulai countdown 60 detik.";
 }
 
 // Menghitung dan menampilkan hasil tanpa melewati logika Free/Premium.
 async function runCalculatorNow(){
     const status = document.getElementById("dataStatus");
-    const treadmillEl = document.getElementById("treadmill");
-    const trailEl = document.getElementById("trail");
-    const multiplierEl = document.getElementById("multiplier");
-    const speedEl = document.getElementById("currentSpeed");
-    const hoursEl = document.getElementById("hours");
 
-    if(!treadmillEl || !trailEl || !multiplierEl || !speedEl || !hoursEl){
-        if(status) status.innerText = "❌ Form kalkulator tidak lengkap. Refresh halaman lalu coba lagi.";
-        throw new Error("Elemen form kalkulator tidak lengkap.");
-    }
+    const treadmill = Number(document.getElementById("treadmill").value);
+    const trail = Number(document.getElementById("trail").value);
+    const multiplier = Number(document.getElementById("multiplier").value);
+    const currentSpeed = parseSpeed(document.getElementById("currentSpeed").value);
+    const hours = Number(document.getElementById("hours").value);
 
-    const treadmill = Number.parseFloat(treadmillEl.value);
-    const trail = Number.parseFloat(trailEl.value);
-    const multiplier = Number.parseFloat(multiplierEl.value);
-    const currentSpeed = parseSpeed(speedEl.value);
-    const hours = Number.parseFloat(hoursEl.value);
-
-    if(!Number.isFinite(treadmill) || treadmill <= 0 || !Number.isFinite(trail) || trail <= 0 || !Number.isFinite(multiplier) || multiplier <= 0){
-        if(status) status.innerText = "❌ Treadmill, Trail, atau Multiplier tidak valid.";
-        throw new Error("Input pilihan kalkulator tidak valid.");
-    }
     if(!Number.isFinite(currentSpeed) || currentSpeed < 0){
-        if(status) status.innerText = "❌ Speed sekarang tidak valid. Contoh: 10K, 2.5M, atau 1B.";
+        if(status) status.innerText = "Speed sekarang tidak valid.";
         throw new Error("Speed sekarang tidak valid.");
     }
+
     if(!Number.isFinite(hours) || hours < 0){
-        if(status) status.innerText = "❌ Waktu AFK tidak valid.";
+        if(status) status.innerText = "Waktu AFK tidak valid.";
         throw new Error("Waktu AFK tidak valid.");
     }
 
@@ -8935,23 +8983,15 @@ async function runCalculatorNow(){
     const gainFromAFK = gainPerHour * hours;
     const totalAfterAFK = currentSpeed + gainFromAFK;
 
-    const resultMap = {
-        resultCurrentSpeed: currentSpeed,
-        resultGainStep: gainPerStep,
-        resultGainSecond: gainPerSecond,
-        resultGainMinute: gainPerMinute,
-        resultGainHour: gainPerHour,
-        resultAFK: gainFromAFK,
-        resultTotal: totalAfterAFK
-    };
+    document.getElementById("resultCurrentSpeed").innerText = formatNumber(currentSpeed);
+    document.getElementById("resultGainStep").innerText = formatNumber(gainPerStep);
+    document.getElementById("resultGainSecond").innerText = formatNumber(gainPerSecond);
+    document.getElementById("resultGainMinute").innerText = formatNumber(gainPerMinute);
+    document.getElementById("resultGainHour").innerText = formatNumber(gainPerHour);
+    document.getElementById("resultAFK").innerText = formatNumber(gainFromAFK);
+    document.getElementById("resultTotal").innerText = formatNumber(totalAfterAFK);
 
-    Object.entries(resultMap).forEach(function([id,value]){
-        const el = document.getElementById(id);
-        if(el) el.innerText = formatNumber(value);
-    });
-
-    if(status) status.innerText = "✅ Perhitungan berhasil. Hasil sudah dihitung dari input yang kamu pilih.";
-    return resultMap;
+    if(status) status.innerText = "Perhitungan berhasil.";
 }
 
 function changePayment(){
