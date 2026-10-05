@@ -4189,28 +4189,47 @@ textarea:focus{
 .topup-warning strong{color:#ffd900}
 .topup-warning-check{display:flex;align-items:flex-start;gap:9px;margin-top:11px;color:#fff;font-weight:700}
 .topup-warning-check input{margin-top:3px;accent-color:#ffd900}
+
+/* Username Roblox help tooltip */
+.topup-username-label{display:flex!important;align-items:center;justify-content:space-between;gap:10px}
+.topup-username-label-left{display:flex;align-items:center;gap:6px}
+.topup-username-help-wrap{position:relative;display:inline-flex;align-items:center}
+.topup-username-help-btn{width:28px;height:28px;border:0;border-radius:8px;background:#30303d;color:#fff;font-weight:900;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:.15s}
+.topup-username-help-btn:hover,.topup-username-help-btn:focus{background:#ffd900;color:#111;outline:none}
+.topup-username-tooltip{position:absolute;right:0;top:calc(100% + 10px);width:330px;background:#4b515d;color:#fff;border-radius:12px;padding:10px;box-shadow:0 12px 30px rgba(0,0,0,.35);z-index:100;opacity:0;visibility:hidden;transform:translateY(-5px);transition:.16s;pointer-events:none}
+.topup-username-help-wrap:hover .topup-username-tooltip,.topup-username-help-wrap.open .topup-username-tooltip{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
+.topup-username-tooltip:before{content:"";position:absolute;right:9px;top:-7px;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid #4b515d}
+.topup-help-profile{background:#fff;color:#20242b;border-radius:9px;padding:9px;display:flex;align-items:center;gap:10px}
+.topup-help-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#d8dde5,#8d96a5);display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
+.topup-help-name{font-weight:800;font-size:15px;line-height:1.2}
+.topup-help-username{display:inline-block;margin-top:4px;padding:1px 4px;border:2px solid #e33;border-radius:2px;color:#222;font-size:11px;font-weight:700;background:#fff}
+.topup-help-text{font-size:12px;line-height:1.35;margin-top:8px;color:#fff;font-weight:700}
+.topup-help-warn{color:#ffd900}
+@media(max-width:560px){.topup-username-tooltip{right:-4px;width:285px}.topup-help-avatar{width:45px;height:45px;font-size:22px}}
+
 .topup-field{margin-top:14px}
 .topup-field label{display:block;margin-bottom:7px;color:#ddd;font-size:13px;font-weight:800}
 .topup-field input,.topup-field select{width:100%;padding:13px;border-radius:12px;border:1px solid #35354e;background:#0d0d18;color:#fff;outline:none}
 .topup-field input:focus,.topup-field select:focus{border-color:#ffd900}
 .topup-price-grid{margin-top:12px}
-.topup-price-table-wrap{overflow-x:auto;border:1px solid #35354e;border-radius:14px;background:#11111c}
-.topup-price-table{width:100%;border-collapse:collapse;min-width:420px}
-.topup-price-table th,.topup-price-table td{padding:11px 12px;border-bottom:1px solid #29293b;text-align:left}
-.topup-price-table th{font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:.5px;background:#171725}
-.topup-price-table tbody tr{cursor:pointer;transition:.15s}
-.topup-price-table tbody tr:hover{background:rgba(255,217,0,.07)}
-.topup-price-table tbody tr.active{background:rgba(255,217,0,.12);box-shadow:inset 3px 0 0 #ffd900}
-.topup-price-table tbody tr.disabled{opacity:.45;cursor:not-allowed}
-.topup-price-table tbody tr:last-child td{border-bottom:0}
-.topup-table-status{font-size:11px;font-weight:700}
-.topup-price-card{border:1px solid #35354e;background:#11111c;border-radius:14px;padding:12px;text-align:left;cursor:pointer;transition:.18s}
-.topup-price-card:hover{border-color:#ffd900;transform:translateY(-1px)}
-.topup-price-card.active{border-color:#ffd900;background:rgba(255,217,0,.08);box-shadow:0 0 0 1px rgba(255,217,0,.22)}
-.topup-price-card.disabled{opacity:.45;cursor:not-allowed;transform:none}
-.topup-price-rbx{font-size:16px;font-weight:900;color:#fff}
-.topup-price-idr{margin-top:4px;color:#ffd900;font-weight:900}
-.topup-price-note{margin-top:3px;color:#777;font-size:10px}
+.topup-price-offers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.topup-price-card{position:relative;border:1px solid #e1e4ea;background:#fff;border-radius:15px;padding:13px 13px 14px;text-align:left;cursor:pointer;transition:.18s;min-height:116px;color:#171a20;box-shadow:0 3px 12px rgba(0,0,0,.08);overflow:hidden}
+.topup-price-card:hover{border-color:#ffd900;transform:translateY(-2px);box-shadow:0 7px 18px rgba(0,0,0,.12)}
+.topup-price-card.active{border-color:#ffd900;background:#fffdf0;box-shadow:0 0 0 2px rgba(255,217,0,.3),0 7px 18px rgba(0,0,0,.1)}
+.topup-price-card.disabled{opacity:.5;cursor:not-allowed;transform:none}
+.topup-price-card-top{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:900;color:#171a20}
+.robux-icon{width:27px;height:27px;flex:0 0 27px;border-radius:8px;background:linear-gradient(145deg,#19c75a,#0a8d38);display:grid;place-items:center;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18),0 2px 5px rgba(0,0,0,.18);transform:skew(-7deg)}
+.robux-icon span{color:#fff;font-size:17px;font-weight:1000;line-height:1;transform:skew(7deg)}
+.topup-price-divider{border-top:1px dashed #d9dde5;margin:10px 0 8px}
+.topup-price-old{font-size:11px;color:#9aa0aa;text-decoration:line-through;min-height:15px}
+.topup-price-idr{margin-top:2px;color:#15181d;font-size:17px;font-weight:950}
+.topup-price-note{margin-top:4px;color:#7a808b;font-size:10px}
+.topup-price-badge{position:absolute;top:0;left:0;background:#e92935;color:#fff;font-size:10px;font-weight:900;padding:5px 7px;border-radius:0 0 7px 0}
+.topup-price-card.has-badge{padding-top:22px}
+.topup-price-status{margin-top:5px;font-size:10px;font-weight:800;color:#149447}
+.topup-price-card.disabled .topup-price-status{color:#d24a58}
+@media(max-width:850px){.topup-price-offers{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:620px){.topup-price-offers{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.topup-price-card{min-height:108px;padding:11px}.topup-price-card-top{font-size:14px}.topup-price-idr{font-size:15px}}
 .topup-custom-row{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:12px}
 .topup-custom-row button{border:0;border-radius:12px;padding:12px 14px;background:#ffd900;color:#111;font-weight:900;cursor:pointer}
 .topup-total{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:15px;padding:14px;border-radius:14px;background:#0d0d18;border:1px solid #35354e}
@@ -4784,11 +4803,6 @@ textarea:focus{
 Pastikan akun Roblox yang digunakan memenuhi persyaratan usia 18+ dan persyaratan akun yang ditetapkan untuk layanan ini. Jika customer tetap melakukan order dengan akun yang tidak memenuhi persyaratan tersebut, risiko/kendala akibat kondisi akun menjadi tanggung jawab customer dan bukan admin SYADZZ STORE.
 <label class="topup-warning-check"><input type="checkbox" id="topupAgeConfirm"><span>Saya sudah membaca dan memahami peringatan tersebut.</span></label>
 </div>
-<div class="topup-field">
-<label>👤 Username Roblox</label>
-<input id="topupRobloxUsername" autocomplete="off" maxlength="40" placeholder="@lukasabiss">
-<div class="topup-muted">Username saja. Jangan masukkan password Roblox.</div>
-</div>
 </div>
 
 <div class="topup-card">
@@ -4804,6 +4818,26 @@ Pastikan akun Roblox yang digunakan memenuhi persyaratan usia 18+ dan persyarata
 <div class="topup-error" id="topupPriceMessage"></div>
 </div>
 <div class="topup-total"><span>TOTAL ROBUX / HARGA</span><strong id="topupTotalValue">0 RBX · Rp0</strong></div>
+</div>
+
+<div class="topup-card">
+<div class="topup-field" style="margin-top:0">
+<label class="topup-username-label">
+<span class="topup-username-label-left">👤 Username Roblox</span>
+<span class="topup-username-help-wrap" id="topupUsernameHelpWrap">
+<button type="button" class="topup-username-help-btn" onclick="toggleTopupUsernameHelp(event)" aria-label="Cara menemukan Username Roblox">?</button>
+<span class="topup-username-tooltip">
+<span class="topup-help-profile">
+<span class="topup-help-avatar">👤</span>
+<span><span class="topup-help-name">DisplayName-mu</span><br><span class="topup-help-username">@UserName-mu</span></span>
+</span>
+<span class="topup-help-text">Pastikan kamu memasukkan <span class="topup-help-warn">Username</span> akun Roblox seperti contoh yang ditandai, <u>bukan Display Name</u>.</span>
+</span>
+</span>
+</label>
+<input id="topupRobloxUsername" autocomplete="off" maxlength="40" placeholder="@lukasabiss">
+<div class="topup-muted">Masukkan Username Roblox yang diawali @. <strong>Jangan gunakan Display Name</strong> dan jangan masukkan password Roblox.</div>
+</div>
 </div>
 
 <div class="topup-card">
@@ -11190,6 +11224,13 @@ function topupRenderStock(){
     if(box) box.classList.toggle("off",!active);
 }
 
+// ===== TOP UP ROBUX STATE =====
+// Inisialisasi wajib supaya halaman tidak berhenti sebelum loadRobuxStore().
+let robuxStoreLoading = false;
+let robuxStoreLoaded = false;
+let robuxStoreSettings = { active:false, stock_robux:0 };
+let robuxStorePrices = [];
+
 function topupGetPriceRows(){
     return (Array.isArray(robuxStorePrices) ? robuxStorePrices : [])
         .map(function(row){
@@ -11201,35 +11242,23 @@ function topupGetPriceRows(){
         .sort(function(a,b){ return b.amount-a.amount; });
 }
 
+// Harga tetap SYADZZ STORE: 1 Robux = Rp156.
+// Perhitungan berlaku untuk semua jumlah Robux, termasuk jumlah custom.
+const TOPUP_PRICE_PER_ROBUX = 156;
+
 function topupCalculatePrice(amount){
     amount=Number(amount||0);
     if(!Number.isInteger(amount) || amount<50){
         return {ok:false,message:"Minimal pembelian adalah 50 Robux."};
     }
-    const rows=topupGetPriceRows();
-    if(!rows.length){
-        return {ok:false,message:"Daftar harga Robux belum berhasil dimuat."};
-    }
 
-    let remaining=amount;
-    let total=0;
-    const parts=[];
+    const total = amount * TOPUP_PRICE_PER_ROBUX;
 
-    for(const row of rows){
-        if(row.amount > remaining) continue;
-        const qty=Math.floor(remaining / row.amount);
-        if(qty <= 0) continue;
-        remaining -= qty * row.amount;
-        total += qty * row.price;
-        parts.push(qty === 1 ? row.amount.toLocaleString("id-ID")+" Robux" : qty+" × "+row.amount.toLocaleString("id-ID")+" Robux");
-        if(remaining === 0) break;
-    }
-
-    if(remaining !== 0){
-        return {ok:false,message:"Nominal "+amount.toLocaleString("id-ID")+" Robux belum dapat dihitung dari daftar harga yang tersedia."};
-    }
-
-    return {ok:true,total:total,parts:parts};
+    return {
+        ok:true,
+        total:total,
+        parts:[amount.toLocaleString("id-ID")+" Robux × Rp"+TOPUP_PRICE_PER_ROBUX.toLocaleString("id-ID")]
+    };
 }
 
 function topupRenderPrices(){
@@ -11239,8 +11268,7 @@ function topupRenderPrices(){
     const active=robuxStoreSettings.active===true && Number(robuxStoreSettings.stock_robux||0)>0;
     const stock=Number(robuxStoreSettings.stock_robux||0);
 
-    // Hanya tampilkan beberapa nominal populer agar tabel tidak terlalu panjang.
-    // Harga tetap dihitung otomatis dari daftar harga SYADZZ STORE di database.
+    // Tampilan dibuat seperti kartu pilihan Robux: ringkas, bergambar, dan tidak terlalu banyak pilihan.
     const presetAmounts=[50,100,250,500,1000,2500,5000];
     const available=presetAmounts.map(function(amount){
         const result=topupCalculatePrice(amount);
@@ -11253,16 +11281,21 @@ function topupRenderPrices(){
         return;
     }
 
-    grid.innerHTML='<div class="topup-price-table-wrap"><table class="topup-price-table"><thead><tr><th>ROBUX</th><th>HARGA</th><th>STOK</th></tr></thead><tbody>'+
-        available.map(function(row){
-            const disabled=!active || row.amount>stock;
-            return '<tr class="'+(disabled?'disabled':'')+'" '+(!disabled?'onclick="selectRobuxAmount('+row.amount+')"':'')+'>'+
-                '<td><strong>'+row.amount.toLocaleString("id-ID")+' RBX</strong></td>'+
-                '<td><strong>'+rupiahTopup(row.price)+'</strong></td>'+
-                '<td><span class="topup-table-status">'+(disabled?(stock<=0?'HABIS':'MELEBIHI STOK'):'TERSEDIA')+'</span></td>'+
-            '</tr>';
-        }).join('')+
-        '</tbody></table></div>';
+    grid.innerHTML='<div class="topup-price-offers">'+available.map(function(row){
+        const disabled=!active || row.amount>stock;
+        const status=disabled ? (stock<=0?'STOK HABIS':'MELEBIHI STOK') : 'TERSEDIA';
+        // Harga coret hanya sebagai tampilan perbandingan 14% bila harga sekarang positif.
+        // Tidak mengubah harga database maupun total pembayaran.
+        const oldPrice=row.price>0 ? Math.round(row.price/0.86) : 0;
+        return '<div class="topup-price-card '+(disabled?'disabled ':'')+'has-badge" '+(!disabled?'onclick="selectRobuxAmount('+row.amount+')"':'')+'>'+
+            '<div class="topup-price-badge">14%</div>'+
+            '<div class="topup-price-card-top"><span class="robux-icon"><span>R</span></span><span>'+row.amount.toLocaleString("id-ID")+'</span></div>'+
+            '<div class="topup-price-divider"></div>'+
+            '<div class="topup-price-old">'+(oldPrice?rupiahTopup(oldPrice):'')+'</div>'+
+            '<div class="topup-price-idr">'+rupiahTopup(row.price)+'</div>'+
+            '<div class="topup-price-status">'+status+'</div>'+
+        '</div>';
+    }).join('')+'</div>';
 }
 
 function selectRobuxAmount(amount){
@@ -11296,9 +11329,9 @@ function topupAmountChanged(){
         }
     }
     if(total) total.innerText=amount.toLocaleString("id-ID")+" RBX · "+rupiahTopup(result.total);
-    document.querySelectorAll(".topup-price-table tbody tr").forEach(function(row){
+    document.querySelectorAll(".topup-price-card").forEach(function(row){
         row.classList.remove("active");
-        const text=row.querySelector("td:first-child")?.innerText||"";
+        const text=row.querySelector(".topup-price-card-top span:last-child")?.innerText||"";
         const n=Number(text.replace(/[^0-9]/g,""));
         if(n===amount) row.classList.add("active");
     });
@@ -11329,6 +11362,19 @@ function topupPreviewProof(){
     reader.readAsDataURL(file);
 }
 
+
+function toggleTopupUsernameHelp(event){
+    if(event) event.stopPropagation();
+    const wrap=document.getElementById("topupUsernameHelpWrap");
+    if(!wrap) return;
+    wrap.classList.toggle("open");
+}
+
+document.addEventListener("click",function(event){
+    const wrap=document.getElementById("topupUsernameHelpWrap");
+    if(wrap && !wrap.contains(event.target)) wrap.classList.remove("open");
+});
+
 function topupUsernameChanged(){
     const input=document.getElementById("topupRobloxUsername");
     if(!input) return;
@@ -11357,32 +11403,41 @@ function topupUpdateButton(){
 async function loadRobuxStore(){
     if(robuxStoreLoading) return;
     robuxStoreLoading=true;
+
+    // Tabel harga tidak boleh ikut tertahan hanya karena stok sedang dimuat.
+    const grid=document.getElementById("topupPriceGrid");
+    if(grid && !grid.querySelector("table")){
+        grid.innerHTML='<div class="topup-muted">Memuat harga...</div>';
+    }
+
     try{
-        // Gunakan RPC publik baru yang kompatibel dengan database saat ini.
-        // Tidak mengubah / menghapus function get_robux_store_v1() lama.
-        const request=supabaseClient.rpc("get_robux_store_public_v2");
-        const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error("Timeout memuat data Top Up Robux.")),10000));
-        const {data,error}=await Promise.race([request,timeout]);
-        if(error) throw error;
+        // Function lama ini SUDAH ADA di database dan return type-nya tidak diubah.
+        const storeRequest=await supabaseClient.rpc("get_robux_store_v1");
+        if(storeRequest.error) throw storeRequest.error;
 
-        const payload=typeof data === "string" ? JSON.parse(data) : (data || {});
-        const settings=payload.settings || {};
-        const prices=Array.isArray(payload.prices) ? payload.prices : [];
-
+        const storeData=Array.isArray(storeRequest.data) ? storeRequest.data[0] : storeRequest.data;
         robuxStoreSettings={
-            active:settings.active===true,
-            stock_robux:Number(settings.stock_robux ?? settings.stock ?? 0)
+            active:storeData?.active===true,
+            stock_robux:Number(storeData?.stock ?? 0)
         };
 
-        // Database saat ini: robux_prices(robux_amount integer, price bigint).
-        robuxStorePrices=prices.map(function(row){
+        // Ambil harga langsung dari tabel yang memang dipakai database sekarang:
+        // robux_prices(robux_amount, price).
+        const priceRequest=await supabaseClient
+            .from("robux_prices")
+            .select("robux_amount, price")
+            .order("robux_amount", {ascending:true});
+
+        if(priceRequest.error) throw priceRequest.error;
+
+        robuxStorePrices=Array.isArray(priceRequest.data) ? priceRequest.data.map(function(row){
             return {
                 robux_amount:Number(row?.robux_amount || 0),
-                price:Number(row?.price || row?.price_idr || 0)
+                price:Number(row?.price || 0)
             };
         }).filter(function(row){
             return Number.isInteger(row.robux_amount) && row.robux_amount>0 && row.price>=0;
-        });
+        }) : [];
 
         robuxStoreLoaded=true;
         topupRenderStock();
@@ -11390,12 +11445,38 @@ async function loadRobuxStore(){
         topupAmountChanged();
         topupChangePayment();
         topupUpdateButton();
+
     }catch(error){
         console.error("Robux store load error:",error);
         robuxStoreLoaded=false;
+
+        // Jangan biarkan tabel hilang hanya karena RPC stok gagal.
+        // Harga tetap bisa ditampilkan dari daftar harga yang sudah menjadi
+        // patokan SYADZZ STORE, sedangkan status stok ditandai gagal dimuat.
+        if(!robuxStorePrices.length){
+            robuxStorePrices=[
+                {robux_amount:50,price:7800},
+                {robux_amount:100,price:15600},
+                {robux_amount:250,price:39000},
+                {robux_amount:500,price:78000},
+                {robux_amount:1000,price:156000},
+                {robux_amount:2500,price:390000},
+                {robux_amount:5000,price:780000}
+            ];
+        }
+
+        robuxStoreSettings={active:false,stock_robux:0};
+        topupRenderStock();
+        topupRenderPrices();
+        topupAmountChanged();
+
         const value=document.getElementById("topupStockValue");
         if(value) value.innerText="GAGAL MEMUAT";
-        topupSetMessage("Gagal memuat Top Up Robux: "+(error.message||"Error")+". Silakan refresh halaman.",false);
+
+        topupSetMessage(
+            "Stok Top Up Robux gagal dimuat: "+(error.message||"Error"),
+            false
+        );
     }finally{
         robuxStoreLoading=false;
     }
