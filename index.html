@@ -11350,7 +11350,7 @@ function topupRenderPrices(){
             '<div class="topup-price-divider"></div>'+
             '<div class="topup-price-old">'+(result.discountPercent>0?rupiahTopup(oldPrice):'')+'</div>'+
             '<div class="topup-price-idr">'+rupiahTopup(result.total)+'</div>'+
-            '<div class="topup-price-unit">Rp'+result.unitPrice.toLocaleString("id-ID")+' / RBX</div>'+
+            ''+
             '<div class="topup-price-status">'+status+'</div>'+
         '</div>';
     }).join('')+'</div>';
