@@ -2490,6 +2490,56 @@ textarea:focus{
 
 </style>
 <style>
+/* ===== ALL GAME SERVICES ===== */
+.all-game-services-panel{
+    max-width:760px;
+}
+.all-game-services-header{
+    text-align:center;
+    margin-bottom:18px;
+}
+.all-game-services-kicker{
+    color:#ffd900;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:1.2px;
+    margin-bottom:5px;
+}
+.all-game-services-subtitle{
+    color:#888;
+    font-size:12px;
+    margin:0;
+}
+.service-choice-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+}
+.service-choice-card{
+    min-height:220px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+.service-choice-card p{
+    min-height:62px;
+}
+.service-back-button{
+    margin-top:0;
+    margin-bottom:18px;
+}
+@media(max-width:650px){
+    .service-choice-grid{
+        grid-template-columns:1fr;
+        gap:12px;
+    }
+    .service-choice-card{
+        min-height:0;
+        padding:23px 13px;
+    }
+}
+</style>
+<style>
 /* ===== FINAL UI FINISHING ===== */
 /* Perpindahan halaman lembut; background tidak ikut bergerak. */
 .page.active{
@@ -4068,20 +4118,6 @@ textarea:focus{
 .calculator-free-count{font-weight:900;color:#8dffc6;font-size:12px;}
 .calculator-free-count.used{color:#ff9aaa;}
 .calculator-free-cooldown{margin-top:8px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,217,0,.35);background:rgba(255,217,0,.05);color:#ffe866;font-size:12px;line-height:1.5;text-align:center;}
-.calculator-follow-overlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(5,5,12,.78);backdrop-filter:blur(10px);}
-.calculator-follow-modal{width:min(430px,100%);border:1px solid rgba(255,217,0,.28);border-radius:24px;background:linear-gradient(145deg,#181820,#0e0e14);box-shadow:0 24px 80px rgba(0,0,0,.55);padding:24px;text-align:center;color:#fff;}
-.calculator-follow-icon{width:64px;height:64px;margin:0 auto 14px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:31px;background:linear-gradient(135deg,#ff0050,#00f2ea);box-shadow:0 10px 30px rgba(255,0,80,.18);}
-.calculator-follow-title{font-size:22px;font-weight:950;letter-spacing:.3px;}
-.calculator-follow-subtitle{margin:8px auto 18px;max-width:340px;color:#bdbdce;font-size:12px;line-height:1.7;}
-.calculator-follow-step{display:flex;gap:11px;text-align:left;align-items:flex-start;margin:10px 0;padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);}
-.calculator-follow-step-num{min-width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#ffd900;color:#111;font-size:12px;font-weight:950;}
-.calculator-follow-step-text{font-size:11px;line-height:1.55;color:#d8d8e5;}
-.calculator-follow-btn{width:100%;border:0;border-radius:14px;padding:13px 16px;margin-top:9px;font-weight:950;font-size:12px;cursor:pointer;}
-.calculator-follow-primary{background:linear-gradient(135deg,#ffd900,#ffb800);color:#111;}
-.calculator-follow-secondary{background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(255,255,255,.1);}
-.calculator-follow-status{min-height:18px;margin-top:10px;font-size:11px;color:#bdbdce;line-height:1.5;}
-.calculator-used-modal .calculator-follow-icon{background:linear-gradient(135deg,#ffd900,#ff9f00);color:#111;}
-.calculator-used-modal .calculator-follow-title{font-size:20px;}
 .calculator-plan-note{font-size:10px;color:#8c8ca4;line-height:1.5;}
 @media(max-width:650px){.calculator-plan-grid{grid-template-columns:1fr;}}
 .calculator-access-card{position:relative;overflow:hidden;}
@@ -4109,6 +4145,63 @@ textarea:focus{
 @media(max-width:650px){.calculator-access-card .calc-payment-grid{grid-template-columns:1fr;}.calculator-access-card .calc-auth-actions{grid-template-columns:1fr;}}
 </style>
 
+<style>
+/* =========================
+   TOP UP ROBUX
+========================= */
+#topupPage .topup-shell{display:grid;gap:16px}
+.topup-card{background:rgba(17,17,28,.92);border:1px solid #35354e;border-radius:18px;padding:18px;box-shadow:0 14px 35px rgba(0,0,0,.18)}
+.topup-head{text-align:center;margin-bottom:14px}
+.topup-title{margin:0;color:#ffd900;font-size:28px;font-weight:900}
+.topup-subtitle{margin:7px 0 0;color:#aaa;font-size:13px;line-height:1.5}
+.topup-stock{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0;padding:14px 16px;border-radius:15px;border:1px solid rgba(0,255,136,.28);background:rgba(0,255,136,.06)}
+.topup-stock.off{border-color:rgba(255,80,100,.3);background:rgba(255,80,100,.06)}
+.topup-stock-label{font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:.7px}
+.topup-stock-value{font-size:22px;font-weight:900;color:#00ff88}
+.topup-stock.off .topup-stock-value{color:#ff6b7a}
+.topup-status-badge{font-size:11px;font-weight:900;padding:7px 10px;border-radius:999px;background:rgba(0,255,136,.12);color:#00ff88;white-space:nowrap}
+.topup-stock.off .topup-status-badge{background:rgba(255,107,122,.12);color:#ff6b7a}
+.topup-warning{border:1px solid rgba(255,217,0,.35);background:rgba(255,217,0,.07);border-radius:15px;padding:14px;color:#ddd;font-size:12px;line-height:1.6}
+.topup-warning strong{color:#ffd900}
+.topup-warning-check{display:flex;align-items:flex-start;gap:9px;margin-top:11px;color:#fff;font-weight:700}
+.topup-warning-check input{margin-top:3px;accent-color:#ffd900}
+.topup-field{margin-top:14px}
+.topup-field label{display:block;margin-bottom:7px;color:#ddd;font-size:13px;font-weight:800}
+.topup-field input,.topup-field select{width:100%;padding:13px;border-radius:12px;border:1px solid #35354e;background:#0d0d18;color:#fff;outline:none}
+.topup-field input:focus,.topup-field select:focus{border-color:#ffd900}
+.topup-price-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.topup-price-card{border:1px solid #35354e;background:#11111c;border-radius:14px;padding:12px;text-align:left;cursor:pointer;transition:.18s}
+.topup-price-card:hover{border-color:#ffd900;transform:translateY(-1px)}
+.topup-price-card.active{border-color:#ffd900;background:rgba(255,217,0,.08);box-shadow:0 0 0 1px rgba(255,217,0,.22)}
+.topup-price-card.disabled{opacity:.45;cursor:not-allowed;transform:none}
+.topup-price-rbx{font-size:16px;font-weight:900;color:#fff}
+.topup-price-idr{margin-top:4px;color:#ffd900;font-weight:900}
+.topup-price-note{margin-top:3px;color:#777;font-size:10px}
+.topup-custom-row{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:12px}
+.topup-custom-row button{border:0;border-radius:12px;padding:12px 14px;background:#ffd900;color:#111;font-weight:900;cursor:pointer}
+.topup-total{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:15px;padding:14px;border-radius:14px;background:#0d0d18;border:1px solid #35354e}
+.topup-total span:first-child{color:#aaa;font-size:12px}
+.topup-total strong{color:#ffd900;font-size:21px}
+.topup-payment-box{display:none;margin-top:12px;padding:14px;border-radius:14px;border:1px solid #35354e;background:#0d0d18}
+.topup-payment-box.active{display:block}
+.topup-proof-preview{display:none;margin-top:10px}
+.topup-proof-preview.active{display:block}
+.topup-proof-preview img{max-width:100%;max-height:240px;border-radius:12px;display:block;margin-top:7px}
+.topup-order-btn{width:100%;margin-top:14px}
+.topup-order-btn:disabled{opacity:.45;cursor:not-allowed}
+.topup-muted{color:#888;font-size:11px;line-height:1.5;margin-top:7px}
+.topup-error{color:#ff6b7a;font-size:12px;margin-top:8px;min-height:18px}
+.topup-success{color:#00ff88;font-size:12px;margin-top:8px}
+.topup-list-title{font-size:13px;color:#aaa;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+@media(max-width:560px){.topup-price-grid{grid-template-columns:1fr 1fr}.topup-custom-row{grid-template-columns:1fr}.topup-stock{align-items:flex-start;flex-direction:column}.topup-title{font-size:24px}}
+</style>
+<style>
+/* ===== GLOBAL MODULE EMOJI MOTION ===== */
+.game-module-card .choice-icon,.service-choice-card .choice-icon,#homePage .choice-card .choice-icon{display:inline-block;transform-origin:center;animation:syadzzEmojiFloat 2.8s ease-in-out infinite;will-change:transform,filter}
+.game-module-card:nth-child(2) .choice-icon{animation-delay:.18s}.game-module-card:nth-child(3) .choice-icon{animation-delay:.36s}.game-module-card:nth-child(4) .choice-icon{animation-delay:.54s}
+@keyframes syadzzEmojiFloat{0%,100%{transform:translateY(0) rotate(0) scale(1);filter:drop-shadow(0 0 0 rgba(255,217,0,0))}25%{transform:translateY(-4px) rotate(-3deg) scale(1.04)}50%{transform:translateY(0) rotate(0) scale(1.08);filter:drop-shadow(0 0 8px rgba(255,217,0,.22))}75%{transform:translateY(-3px) rotate(3deg) scale(1.04)}}
+@media(prefers-reduced-motion:reduce){.game-module-card .choice-icon,.service-choice-card .choice-icon,#homePage .choice-card .choice-icon{animation:none}}
+</style>
 </head>
 <body>
 <div class="maintenance-screen" id="maintenanceScreen">
@@ -4183,37 +4276,12 @@ textarea:focus{
 <div class="admin-online-hours">18:00 - 22:00 WIB</div>
 </div>
 <section aria-label="Main system modules" class="game-module-section">
-<div class="game-section-heading">
-<div>
-<div class="game-section-kicker">MAIN SYSTEM</div>
-<div class="game-section-title">SELECT MODULE</div>
-</div>
-<div class="game-section-badge">03 MODULES</div>
-</div>
+<div class="game-section-heading"><div><div class="game-section-kicker">MAIN SYSTEM</div><div class="game-section-title">SELECT MODULE</div></div><div class="game-section-badge">03 MODULES</div></div>
 <div class="choice-grid game-module-grid">
-<div class="choice-card game-module-card" onclick="choiceNavigate(this,'calculatorPage',event)">
-<div class="game-module-topline"><span>MODULE 01</span><span>READY</span></div>
-<div class="choice-icon">⚡</div>
-<h2>HITUNG SPEED</h2>
-<p>Hitung speed berdasarkan treadmill, trail, multiplier dan waktu AFK.</p>
-<div class="game-module-action">OPEN SPEED HUD <span>›</span></div>
-</div>
-<div class="choice-card game-module-card" onclick="choiceNavigate(this,'jokiPage',event)">
-<div class="game-module-topline"><span>MODULE 02</span><span>READY</span></div>
-<div class="choice-icon">👟⚡</div>
-<h2>JOKI</h2>
-<p>Pilih paket joki, pembayaran dan kirim order.</p>
-<div class="game-module-action">OPEN MISSION CENTER <span>›</span></div>
-</div>
-<div class="choice-card game-module-card game-module-card-wide faq-module-card" onclick="choiceNavigate(this,'faqPage',event)">
-<div class="game-module-topline"><span>MODULE 03</span><span>ONLINE</span></div>
-<div class="choice-icon">💬</div>
-<h2>FAQ ADMIN CHAT</h2>
-<p>Temukan jawaban cepat melalui room chat SYADZZ STORE.</p>
-<div class="game-module-action">OPEN ADMIN CHAT <span>›</span></div>
-</div>
-</div>
-</section>
+<div class="choice-card game-module-card game-module-card-wide all-game-services-card" onclick="choiceNavigate(this,'allGameServicesPage',event)"><div class="game-module-topline"><span>MODULE 01</span><span>READY</span></div><div class="choice-icon">🎮</div><h2>ALL GAME SERVICES</h2><p>Kalkulator Speed dan layanan Joki Egg dalam satu menu.</p><div class="game-module-action">OPEN GAME SERVICES <span>›</span></div></div>
+<div class="choice-card game-module-card" onclick="choiceNavigate(this,'topupPage',event)"><div class="game-module-topline"><span>MODULE 02</span><span>READY</span></div><div class="choice-icon">💰</div><h2>TOP UP ROBUX</h2><p>Top Up Robux via username dengan stok dan harga yang diatur admin.</p><div class="game-module-action">OPEN ROBUX STORE <span>›</span></div></div>
+<div class="choice-card game-module-card game-module-card-wide faq-module-card" onclick="choiceNavigate(this,'faqPage',event)"><div class="game-module-topline"><span>MODULE 03</span><span>ONLINE</span></div><div class="choice-icon">💬</div><h2>FAQ ADMIN CHAT</h2><p>Temukan jawaban cepat melalui room chat SYADZZ STORE.</p><div class="game-module-action">OPEN ADMIN CHAT <span>›</span></div></div>
+</div></section>
 <section aria-label="System panel" class="game-system-panel">
 <div class="game-section-heading compact-heading">
 <div>
@@ -4646,7 +4714,7 @@ textarea:focus{
 <span class="faq-number">59</span>
 <span>🔵 Login Google gagal — Apa yang harus saya lakukan?</span>
 </button>
-<button class="faq-question-row" data-answer="🧮 SETELAH LOGIN: Pilih GRATIS untuk menggunakan akses Free sesuai batas yang tampil, atau pilih PREMIUM jika ingin akses permanen tanpa batas. Pada mode GRATIS, klik HITUNG, Follow TikTok @syadzz011, kembali ke website, lalu tekan SAYA SUDAH FOLLOW untuk menampilkan hasil." data-category="ACCOUNT" data-number="60" onclick="openFaqChat(this,event)" type="button">
+<button class="faq-question-row" data-answer="🧮 SETELAH LOGIN: Pilih GRATIS untuk menggunakan akses Free sesuai batas yang tampil, atau pilih PREMIUM jika ingin akses permanen tanpa iklan. Pada mode GRATIS, klik HITUNG untuk membuka iklan, lalu hasil perhitungan langsung muncul setelah iklan berhasil dibuka." data-category="ACCOUNT" data-number="60" onclick="openFaqChat(this,event)" type="button">
 <span class="faq-number">60</span>
 <span>🧮 Setelah login — Bagaimana cara mulai menggunakan kalkulator?</span>
 </button>
@@ -4666,6 +4734,106 @@ textarea:focus{
         </button>
 </div>
 </div>
+<div class="page" id="topupPage">
+<div class="topup-shell">
+<div class="topup-card">
+<div class="topup-head">
+<h2 class="topup-title">💰 TOP UP ROBUX</h2>
+<div class="topup-subtitle">Top Up Robux via Username (USN). Tidak perlu password Roblox.</div>
+</div>
+<div class="topup-stock" id="topupStockBox">
+<div><div class="topup-stock-label">Stok Robux Tersedia</div><div class="topup-stock-value" id="topupStockValue">Memuat...</div></div>
+<div class="topup-status-badge" id="topupStockStatus">MEMUAT</div>
+</div>
+<div class="topup-warning">
+<strong>⚠️ PERINGATAN PENTING</strong><br>
+Pastikan akun Roblox yang digunakan memenuhi persyaratan usia 18+ dan persyaratan akun yang ditetapkan untuk layanan ini. Jika customer tetap melakukan order dengan akun yang tidak memenuhi persyaratan tersebut, risiko/kendala akibat kondisi akun menjadi tanggung jawab customer dan bukan admin SYADZZ STORE.
+<label class="topup-warning-check"><input type="checkbox" id="topupAgeConfirm"><span>Saya sudah membaca dan memahami peringatan tersebut.</span></label>
+</div>
+<div class="topup-field">
+<label>👤 Username Roblox</label>
+<input id="topupRobloxUsername" autocomplete="off" maxlength="40" placeholder="@lukasabiss">
+<div class="topup-muted">Username saja. Jangan masukkan password Roblox.</div>
+</div>
+</div>
+
+<div class="topup-card">
+<div class="topup-list-title">PILIHAN ROBUX & HARGA</div>
+<div class="topup-muted">Minimum pembelian 50 Robux. Harga otomatis sesuai daftar harga SYADZZ STORE dan tidak diatur admin.</div>
+<div class="topup-price-grid" id="topupPriceGrid"><div class="topup-muted">Memuat harga...</div></div>
+<div class="topup-field">
+<label>🔢 Jumlah Robux</label>
+<div class="topup-custom-row">
+<input id="topupRobuxAmount" type="number" min="50" step="1" placeholder="Minimal 50 Robux" oninput="topupAmountChanged()">
+<button type="button" onclick="topupUseMaxStock()">MAKS STOK</button>
+</div>
+<div class="topup-error" id="topupPriceMessage"></div>
+</div>
+<div class="topup-total"><span>TOTAL ROBUX / HARGA</span><strong id="topupTotalValue">0 RBX · Rp0</strong></div>
+</div>
+
+<div class="topup-card">
+<div class="topup-list-title">💳 PEMBAYARAN</div>
+<div class="topup-field" style="margin-top:0">
+<label>Metode Pembayaran</label>
+<select id="topupPaymentMethod" onchange="topupChangePayment()">
+<option value="">Pilih metode pembayaran</option>
+<option value="QRIS">QRIS</option>
+<option value="DANA">DANA</option>
+</select>
+</div>
+<div class="topup-payment-box" id="topupQrisBox">
+<strong>QRIS</strong><div class="topup-muted">Bayar sesuai total di atas.</div>
+<img alt="QRIS Pembayaran" class="qris-image" src="qris.jpeg" onerror="this.style.display='none';document.getElementById('topupQrisError').style.display='block';">
+<div id="topupQrisError" class="topup-error" style="display:none">QRIS tidak ditemukan.</div>
+</div>
+<div class="topup-payment-box" id="topupDanaBox">
+<strong>DANA</strong><div class="topup-muted">Nama penerima: Muhammad Rasyad Mubarok</div><div class="topup-muted">Nomor DANA: 087729174391</div>
+</div>
+<div class="topup-field">
+<label>📱 WhatsApp Customer</label>
+<input id="topupCustomerWA" type="tel" maxlength="20" placeholder="Contoh: 081234567890">
+</div>
+<div class="topup-field">
+<label>🧾 Upload Bukti Pembayaran</label>
+<input id="topupProofFile" type="file" accept="image/jpeg,image/png,image/webp" onchange="topupPreviewProof()">
+<div class="topup-muted">JPG, PNG, WEBP — maksimal 5 MB.</div>
+<div class="topup-proof-preview" id="topupProofPreview"><img id="topupProofPreviewImage" alt="Preview bukti pembayaran"></div>
+</div>
+<div class="topup-error" id="topupOrderMessage"></div>
+<button class="btn btn-primary topup-order-btn" id="topupOrderButton" type="button" onclick="submitRobuxTopup()" disabled>🛒 PESAN TOP UP ROBUX</button>
+<button class="btn btn-secondary topup-order-btn" type="button" onclick="showPage('homePage')">⬅ KEMBALI</button>
+</div>
+</div>
+</div>
+
+<div class="page" id="allGameServicesPage">
+<div class="card all-game-services-panel">
+<button class="btn btn-secondary service-back-button" onclick="showPage('homePage')" type="button">⬅ KEMBALI KE HOME</button>
+<div class="all-game-services-header">
+<div class="all-game-services-kicker">ALL GAME SERVICES</div>
+<h2 class="section-title">🎮 PILIH LAYANAN</h2>
+<p class="all-game-services-subtitle">Pilih layanan yang ingin kamu gunakan.</p>
+</div>
+
+<div class="service-choice-grid">
+<div class="choice-card service-choice-card" onclick="choiceNavigate(this,'calculatorPage',event)">
+<div class="choice-icon">⚡</div>
+<h2>KALKULATOR SPEED</h2>
+<p>Hitung speed berdasarkan treadmill, trail, multiplier dan waktu AFK.</p>
+<div class="game-module-action">OPEN CALCULATOR <span>›</span></div>
+</div>
+
+<div class="choice-card service-choice-card" onclick="choiceNavigate(this,'jokiPage',event)">
+<div class="choice-icon">🥚</div>
+<h2>JOKI EGG</h2>
+<p>Pilih paket Joki Egg, pembayaran, bukti pembayaran, dan kirim order.</p>
+<div class="game-module-action">OPEN JOKI EGG <span>›</span></div>
+</div>
+</div>
+</div>
+</div>
+
 <div class="page calculator-locked" id="calculatorPage">
 <div class="card calculator-access-card" id="calculatorAccessCard">
 <div class="calc-access-box">
@@ -4704,7 +4872,7 @@ Pilih akun Google yang ingin digunakan untuk Kalkulator Speed.
 <div class="calculator-plan-grid">
 <button id="calculatorFreePlanBtn" class="calculator-plan-btn" type="button" onclick="selectCalculatorPlan('free')">
 <span class="plan-title">🆓 GRATIS</span>
-<span class="plan-sub">1 kali hitung setiap 2 hari • Wajib Follow TikTok.</span>
+<span class="plan-sub">1 kali hitung setiap 2 hari • iklan.</span>
 </button>
 <button id="calculatorPremiumPlanBtn" class="calculator-plan-btn" type="button" onclick="selectCalculatorPlan('premium')">
 <span class="plan-title">👑 PREMIUM</span>
@@ -4716,31 +4884,7 @@ Pilih akun Google yang ingin digunakan untuk Kalkulator Speed.
 <span id="calculatorFreeCount" class="calculator-free-count">MEMERIKSA...</span>
 </div>
 <div id="calculatorFreeCooldown" class="calculator-free-cooldown" style="display:none;"></div>
-<div id="calculatorFollowOverlay" class="calculator-follow-overlay" aria-hidden="true">
-<div class="calculator-follow-modal" role="dialog" aria-modal="true" aria-labelledby="calculatorFollowTitle">
-<div class="calculator-follow-icon">♪</div>
-<div id="calculatorFollowTitle" class="calculator-follow-title">Wajib Follow TikTok ✨</div>
-<div class="calculator-follow-subtitle">Untuk menggunakan <strong>Kalkulator Speed GRATIS</strong>, kamu wajib Follow TikTok <strong>@syadzz011</strong> terlebih dahulu.</div>
-<div id="calculatorFollowSteps">
-<div class="calculator-follow-step"><div class="calculator-follow-step-num">1</div><div class="calculator-follow-step-text"><strong>Buka TikTok SYADZZ</strong><br>Tekan tombol di bawah untuk masuk ke TikTok.</div></div>
-<div class="calculator-follow-step"><div class="calculator-follow-step-num">2</div><div class="calculator-follow-step-text"><strong>Follow @syadzz011</strong><br>Follow akun TikTok SYADZZ terlebih dahulu.</div></div>
-<div class="calculator-follow-step"><div class="calculator-follow-step-num">3</div><div class="calculator-follow-step-text"><strong>Kembali ke website</strong><br>Setelah Follow, kembali ke tab SYADZZ STORE.</div></div>
-</div>
-<button id="calculatorFollowButton" class="calculator-follow-btn calculator-follow-primary" type="button">♪ FOLLOW TIKTOK @SYADZZ011</button>
-<button id="calculatorFollowResumeButton" class="calculator-follow-btn calculator-follow-secondary" type="button" style="display:none;">✓ SAYA SUDAH FOLLOW — LANJUTKAN</button>
-<div id="calculatorFollowStatus" class="calculator-follow-status">Follow TikTok terlebih dahulu untuk melanjutkan.</div>
-</div>
-</div>
-<div id="calculatorFreeUsedOverlay" class="calculator-follow-overlay" aria-hidden="true">
-<div class="calculator-follow-modal calculator-used-modal" role="dialog" aria-modal="true" aria-labelledby="calculatorFreeUsedTitle">
-<div class="calculator-follow-icon">✓</div>
-<div id="calculatorFreeUsedTitle" class="calculator-follow-title">Jatah GRATIS Sudah Dipakai</div>
-<div id="calculatorFreeUsedMessage" class="calculator-follow-subtitle">Kamu sudah menggunakan 1 kali hitung GRATIS. Silakan tunggu sampai jatah berikutnya tersedia atau gunakan PREMIUM untuk akses tanpa batas.</div>
-<button id="calculatorFreeUsedCloseButton" class="calculator-follow-btn calculator-follow-secondary" type="button">TUTUP</button>
-</div>
-</div>
-
-<div class="calculator-plan-note" style="margin-top:8px;">Gratis bisa digunakan 1 kali setiap 2 hari. Wajib Follow TikTok sebelum hasil kalkulator ditampilkan.</div>
+<div class="calculator-plan-note" style="margin-top:8px;">Gratis bisa digunakan 1 kali setiap 2 hari. Klik HITUNG untuk membuka iklan, lalu hasil kalkulator langsung ditampilkan.</div>
 </div>
 
 <div id="calculatorAccessGranted" style="display:none;">
@@ -5205,8 +5349,7 @@ let calculatorPremiumActive = false;
 let calculatorFreeBusy = false;
 let calculatorFreeReady = false;
 const CALCULATOR_FREE_DAYS = 2;
-const CALCULATOR_TIKTOK_URL = "https://www.tiktok.com/@syadzz011";
-let calculatorFollowWaitingForReturn = false;
+const CALCULATOR_FREE_AD_URL = "https://bony-teaching.com/7XrmVI";
 const CALCULATOR_SOFT_LOGIN_KEY = "syadzz_calculator_email";
 const CALCULATOR_SOFT_LOGOUT_KEY = "syadzz_calculator_logged_out";
 
@@ -5254,116 +5397,18 @@ function setCalculatorCalculateButtonState(ready){
 }
 
 function stopCalculatorFreeCooldown(){
-    calculatorFollowWaitingForReturn=false;
+    // Countdown kalkulator GRATIS sudah dihapus.
+    try{ localStorage.removeItem("syadzz_calculator_free_ad_cooldown_until"); }catch(_){}
 }
 
 function restoreCalculatorFreeAdCooldown(){
+    // Bersihkan sisa countdown lama dari versi sebelumnya.
     stopCalculatorFreeCooldown();
 }
 
-function showCalculatorFollowGate(){
-    const overlay=document.getElementById("calculatorFollowOverlay");
-    const steps=document.getElementById("calculatorFollowSteps");
-    const followBtn=document.getElementById("calculatorFollowButton");
-    const resumeBtn=document.getElementById("calculatorFollowResumeButton");
-    const status=document.getElementById("calculatorFollowStatus");
-    if(!overlay) return;
-    overlay.style.display="flex";
-    overlay.setAttribute("aria-hidden","false");
-    if(steps) steps.style.display="block";
-    if(followBtn) followBtn.style.display="block";
-    if(resumeBtn) resumeBtn.style.display="none";
-    if(status) status.innerText="Silakan Follow TikTok, lalu kembali ke sini dan tekan tombol di bawah.";
-}
-
-function hideCalculatorFollowGate(){
-    const overlay=document.getElementById("calculatorFollowOverlay");
-    if(overlay){ overlay.style.display="none"; overlay.setAttribute("aria-hidden","true"); }
-}
-
-async function finishCalculatorFreeFlow(){
-    hideCalculatorFreeUsedGate();
-    const status=document.getElementById("dataStatus");
-    const resultCard=document.getElementById("calculatorResultCard");
-    const consumed=await getCalculatorFreeAccessConsume();
-    if(!consumed || consumed.ok!==true || consumed.allowed!==true){
-        calculatorFreeBusy=false;
-        calculatorFollowWaitingForReturn=false;
-        hideCalculatorFollowGate();
-        setCalculatorFreeStatus(false,"TERPAKAI 2 HARI");
-        setCalculatorCalculateButtonState(false);
-        if(status) status.innerText=consumed?.message || "⚠️ Jatah GRATIS tidak dapat digunakan.";
-        return;
-    }
-    try{
-        await runCalculatorNow();
-        if(resultCard) resultCard.style.display="";
-        calculatorFreeBusy=false;
-        calculatorFreeReady=false;
-        calculatorFollowWaitingForReturn=false;
-        setCalculatorCalculateButtonState(false);
-        setCalculatorFreeStatus(false,"TERPAKAI 2 HARI");
-        hideCalculatorFollowGate();
-        const box=document.getElementById("calculatorFreeCooldown");
-        if(box){ box.style.display="none"; box.innerText=""; }
-        if(status) status.innerText="✅ Follow berhasil dikonfirmasi. Hasil kalkulator sudah ditampilkan.";
-    }catch(error){
-        console.error("Calculator calculation error:",error);
-        calculatorFreeBusy=false;
-        calculatorFollowWaitingForReturn=false;
-        hideCalculatorFollowGate();
-        if(status) status.innerText="❌ Gagal menghitung. Silakan cek input kalkulator.";
-    }
-}
-
-function showCalculatorFreeUsedGate(nextAvailableAt){
-    const overlay=document.getElementById("calculatorFreeUsedOverlay");
-    const message=document.getElementById("calculatorFreeUsedMessage");
-    if(!overlay) return;
-    if(message){
-        message.innerText = nextAvailableAt
-            ? "Jatah GRATIS kamu sudah digunakan. Jatah berikutnya tersedia " + new Date(nextAvailableAt).toLocaleString("id-ID", {timeZone:"Asia/Jakarta"}) + ". Kamu juga bisa memilih PREMIUM untuk akses tanpa batas."
-            : "Jatah GRATIS kamu sudah digunakan. Jatah berikutnya dapat dipakai setelah 2 hari. Kamu juga bisa memilih PREMIUM untuk akses tanpa batas.";
-    }
-    overlay.style.display="flex";
-    overlay.setAttribute("aria-hidden","false");
-}
-
-function hideCalculatorFreeUsedGate(){
-    const overlay=document.getElementById("calculatorFreeUsedOverlay");
-    if(overlay){ overlay.style.display="none"; overlay.setAttribute("aria-hidden","true"); }
-}
-
-function setupCalculatorFollowGate(){
-    const followBtn=document.getElementById("calculatorFollowButton");
-    const resumeBtn=document.getElementById("calculatorFollowResumeButton");
-    if(followBtn && !followBtn.dataset.bound){
-        followBtn.dataset.bound="1";
-        followBtn.addEventListener("click",()=>{
-            calculatorFollowWaitingForReturn=true;
-            const status=document.getElementById("calculatorFollowStatus");
-            if(status) status.innerText="TikTok sudah dibuka. Follow @syadzz011, lalu kembali ke website dan tekan SAYA SUDAH FOLLOW.";
-            const w=window.open(CALCULATOR_TIKTOK_URL,"_blank","noopener,noreferrer");
-            if(!w && status) status.innerText="⚠️ TikTok diblokir browser. Izinkan pop-up lalu tekan tombol Follow lagi.";
-            if(resumeBtn) resumeBtn.style.display="block";
-        });
-    }
-    if(resumeBtn && !resumeBtn.dataset.bound){
-        resumeBtn.dataset.bound="1";
-        resumeBtn.addEventListener("click",async()=>{
-            const status=document.getElementById("calculatorFollowStatus");
-            if(status) status.innerText="Memproses hasil kalkulator...";
-            await finishCalculatorFreeFlow();
-        });
-    }
-}
-
-setupCalculatorFollowGate();
-const calculatorFreeUsedCloseButton=document.getElementById("calculatorFreeUsedCloseButton");
-if(calculatorFreeUsedCloseButton && !calculatorFreeUsedCloseButton.dataset.bound){
-    calculatorFreeUsedCloseButton.dataset.bound="1";
-    calculatorFreeUsedCloseButton.addEventListener("click",hideCalculatorFreeUsedGate);
-}
+document.addEventListener("visibilitychange", function(){
+    if(!document.hidden){ restoreCalculatorFreeAdCooldown(); }
+});
 
 async function getCalculatorFreeAccess(){
     try{
@@ -5403,13 +5448,19 @@ async function refreshCalculatorFreeStatus(){
             const box = document.getElementById("calculatorFreeCooldown");
             if(box){
                 box.style.display = "block";
-                box.innerText = "🎵 Klik HITUNG, Follow TikTok @syadzz011, kembali ke website, lalu kembali ke website lalu konfirmasi Follow.";
+                box.innerText = "📢 Klik HITUNG untuk membuka iklan, lalu hasil kalkulator langsung ditampilkan.";
             }
         }else{
             stopCalculatorFreeCooldown();
             setCalculatorCalculateButtonState(false);
+
             const box = document.getElementById("calculatorFreeCooldown");
-            if(box){ box.style.display = "none"; box.innerText = ""; }
+            if(box){
+                box.style.display = "block";
+                box.innerText = result.next_available_at
+                    ? "⏳ Jatah gratis berikutnya tersedia " + new Date(result.next_available_at).toLocaleString("id-ID", {timeZone:"Asia/Jakarta"}) + "."
+                    : "❌ Jatah gratis sudah digunakan. Bisa dipakai lagi setelah 2 hari.";
+            }
         }
     }else{
         setCalculatorFreeStatus(false, "CEK GAGAL");
@@ -5923,12 +5974,20 @@ function isPageUnderMaintenance(pageId){
         return true;
     }
 
+    if(maintenanceSettings.target === "all_game_services"){
+        return ["allGameServicesPage","calculatorPage","jokiPage"].includes(pageId);
+    }
+
     if(maintenanceSettings.target === "speed"){
         return pageId === "calculatorPage";
     }
 
     if(maintenanceSettings.target === "joki"){
         return pageId === "jokiPage";
+    }
+
+    if(maintenanceSettings.target === "topup"){
+        return pageId === "topupPage";
     }
 
     return false;
@@ -6020,6 +6079,9 @@ function showPage(pageId){
 
     if(pageId === "calculatorPage" && typeof loadCalculatorAccess === "function"){
         loadCalculatorAccess();
+    }
+    if(pageId === "topupPage" && typeof loadRobuxStore === "function"){
+        loadRobuxStore();
     }
 
     if(pageId !== "jokiPage"){
@@ -8883,52 +8945,146 @@ async function getCalculatorFreeAccessConsume(){
 }
 
 async function hitung(){
-    const status=document.getElementById("dataStatus");
+
+    const status = document.getElementById("dataStatus");
+
+    // =========================
+    // CEK LOGIN
+    // =========================
     if(!calculatorAccessUser){
-        if(status) status.innerText="🔒 Login terlebih dahulu untuk menggunakan kalkulator.";
+        if(status){
+            status.innerText = "🔒 Login terlebih dahulu untuk menggunakan kalkulator.";
+        }
         await loadCalculatorAccess();
         return;
     }
 
+    // =========================
+    // PREMIUM
+    // =========================
+    // Premium selalu langsung menghitung. Tidak melewati iklan / kuota Free.
     if(calculatorPremiumActive){
-        calculatorPlan="premium";
+        calculatorPlan = "premium";
         setCalculatorPlanButtons();
-        calculatorFreeBusy=false;
+        calculatorFreeBusy = false;
         setCalculatorCalculateButtonState(true);
+
         return runCalculatorNow();
     }
 
-    calculatorPlan="free";
+    // =========================
+    // FREE
+    // =========================
+    calculatorPlan = "free";
     setCalculatorPlanButtons();
+
     if(calculatorFreeBusy){
-        if(status) status.innerText="⏳ Proses GRATIS sedang berjalan. Selesaikan Follow lalu konfirmasi.";
+        if(status) status.innerText = "⏳ Countdown masih berjalan. Tunggu sampai 0.";
         return;
     }
 
-    const access=await getCalculatorFreeAccess();
-    if(!access || access.ok===false){
-        if(status) status.innerText=access?.message || "❌ Gagal mengecek jatah GRATIS.";
+    // Cek ulang ke Supabase agar status kuota selalu terbaru.
+    const access = await getCalculatorFreeAccess();
+
+    if(!access || access.ok === false){
+        if(status){
+            status.innerText = access?.message || "❌ Gagal mengecek jatah GRATIS.";
+        }
         return;
     }
-    if(access.available!==true){
-        calculatorFreeReady=false;
-        calculatorFreeBusy=false;
-        setCalculatorFreeStatus(false,"TERPAKAI");
+
+    if(access.available !== true){
+        calculatorFreeReady = false;
+        setCalculatorFreeStatus(false, "TERPAKAI 2 HARI");
         setCalculatorCalculateButtonState(false);
-        const box=document.getElementById("calculatorFreeCooldown");
-        if(box){ box.style.display="none"; box.innerText=""; }
-        showCalculatorFreeUsedGate(access.next_available_at);
-        if(status) status.innerText="⚠️ Jatah GRATIS sudah digunakan.";
+
+        const box = document.getElementById("calculatorFreeCooldown");
+        if(box){
+            box.style.display = "block";
+            box.innerText = access.next_available_at
+                ? "⏳ Jatah GRATIS dapat digunakan kembali " + new Date(access.next_available_at).toLocaleString("id-ID", {timeZone:"Asia/Jakarta"}) + "."
+                : "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
+        }
+
+        if(status){
+            status.innerText = "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
+        }
         return;
     }
 
-    calculatorFreeReady=true;
-    calculatorFreeBusy=true;
+    calculatorFreeReady = true;
+    calculatorFreeBusy = true;
     setCalculatorCalculateButtonState(false);
-    const resultCard=document.getElementById("calculatorResultCard");
-    if(resultCard) resultCard.style.display="none";
-    showCalculatorFollowGate();
-    if(status) status.innerText="🎵 Wajib Follow TikTok @syadzz011 terlebih dahulu, lalu kembali ke website dan tekan SAYA SUDAH FOLLOW.";
+
+    // =========================
+    // BUKA IKLAN
+    // =========================
+    if(status) status.innerText = "📢 Membuka iklan...";
+
+    const adWindow = window.open(
+        CALCULATOR_FREE_AD_URL,
+        "_blank",
+        "noopener,noreferrer"
+    );
+
+    if(!adWindow){
+        calculatorFreeBusy = false;
+        calculatorFreeReady = true;
+        setCalculatorCalculateButtonState(true);
+        if(status){
+            status.innerText = "⚠️ Iklan diblokir browser. Izinkan pop-up lalu klik HITUNG lagi.";
+        }
+        return;
+    }
+
+    // =========================
+    // KONSUMSI KUOTA
+    // =========================
+    const consumed = await getCalculatorFreeAccessConsume();
+
+    if(!consumed || consumed.ok !== true || consumed.allowed !== true){
+        calculatorFreeBusy = false;
+        calculatorFreeReady = false;
+        setCalculatorCalculateButtonState(false);
+
+        try{ adWindow.close(); }catch(_){}
+
+        const message = consumed?.message || "⚠️ Jatah GRATIS telah digunakan. Dapat digunakan kembali setelah 2 hari.";
+
+        setCalculatorFreeStatus(false, "TERPAKAI 2 HARI");
+
+        const box = document.getElementById("calculatorFreeCooldown");
+        if(box){
+            box.style.display = "block";
+            box.innerText = message;
+        }
+
+        if(status) status.innerText = message;
+        return;
+    }
+
+    // Kuota berhasil dipakai. Hitung dan langsung tampilkan hasil.
+    calculatorFreeReady = false;
+    calculatorFreeBusy = true;
+    setCalculatorFreeStatus(false, "TERPAKAI 2 HARI");
+
+    const resultCard = document.getElementById("calculatorResultCard");
+    if(resultCard) resultCard.style.display = "none";
+
+    try{
+        await runCalculatorNow();
+        if(resultCard) resultCard.style.display = "";
+        calculatorFreeBusy = false;
+        calculatorFreeReady = false;
+        setCalculatorCalculateButtonState(false);
+        const box = document.getElementById("calculatorFreeCooldown");
+        if(box){ box.style.display = "none"; box.innerText = ""; }
+        if(status){ status.innerText = "✅ Perhitungan selesai. Hasil kalkulator sudah ditampilkan."; }
+    }catch(error){
+        console.error("Calculator calculation error:", error);
+        calculatorFreeBusy = false;
+        if(status) status.innerText = "❌ Gagal menghitung. Silakan cek input kalkulator.";
+    }
 }
 
 // Menghitung dan menampilkan hasil tanpa melewati logika Free/Premium.
@@ -10978,6 +11134,219 @@ function togglePasswordVisibility(){
     button.setAttribute("title", showing ? "Tampilkan password" : "Sembunyikan password");
 }
 
+
+function rupiahTopup(value){
+    return "Rp" + Number(value || 0).toLocaleString("id-ID");
+}
+
+function topupSetMessage(message, ok){
+    const el=document.getElementById("topupOrderMessage");
+    if(!el) return;
+    el.className=ok ? "topup-success" : "topup-error";
+    el.innerText=message || "";
+}
+
+function topupRenderStock(){
+    const box=document.getElementById("topupStockBox");
+    const value=document.getElementById("topupStockValue");
+    const status=document.getElementById("topupStockStatus");
+    const active=robuxStoreSettings.active===true && Number(robuxStoreSettings.stock_robux||0)>0;
+    if(value) value.innerText=Number(robuxStoreSettings.stock_robux||0).toLocaleString("id-ID")+" RBX";
+    if(status) status.innerText=active ? "TOP UP TERSEDIA" : "TOP UP HABIS";
+    if(box) box.classList.toggle("off",!active);
+}
+
+function topupCalculatePrice(amount){
+    amount=Number(amount||0);
+    if(!Number.isInteger(amount) || amount<50){
+        return {ok:false,message:"Minimal pembelian adalah 50 Robux."};
+    }
+    if(amount>Number(robuxStoreSettings.stock_robux||0)){
+        return {ok:false,message:"Jumlah Robux melebihi stok yang tersedia."};
+    }
+
+    // HARGA TOP UP FIXED — BUKAN DIATUR ADMIN
+    const PRICE_TABLE={
+        10:2000,25:5000,50:10000,75:15000,100:16000,125:21000,
+        150:24000,175:29000,200:32000,225:37000,250:40000,275:45000,
+        300:48000,325:53000,350:56000,375:61000,400:64000,425:69000,
+        450:72000,475:77000,500:78000
+    };
+
+    if(PRICE_TABLE[amount] !== undefined){
+        return {ok:true,total:PRICE_TABLE[amount],parts:[amount+" Robux"]};
+    }
+
+    return {
+        ok:false,
+        message:"Nominal "+amount.toLocaleString("id-ID")+" Robux belum tersedia. Pilih nominal yang tersedia pada daftar harga."
+    };
+}
+
+function topupRenderPrices(){
+    const grid=document.getElementById("topupPriceGrid");
+    if(!grid) return;
+    const active=robuxStoreSettings.active===true && Number(robuxStoreSettings.stock_robux||0)>0;
+    const PRICE_TABLE={
+        50:10000,75:15000,100:16000,125:21000,150:24000,175:29000,200:32000,225:37000,
+        250:40000,275:45000,300:48000,325:53000,350:56000,375:61000,400:64000,
+        425:69000,450:72000,475:77000,500:78000
+    };
+    grid.innerHTML=Object.entries(PRICE_TABLE).map(([amount,price])=>{
+        amount=Number(amount);
+        const disabled=!active || amount>Number(robuxStoreSettings.stock_robux||0);
+        return '<button type="button" class="topup-price-card'+(disabled?' disabled':'')+'" '+(disabled?'disabled ':'')+'onclick="selectRobuxAmount('+amount+')"><div class="topup-price-rbx">'+amount.toLocaleString("id-ID")+' ROBUX</div><div class="topup-price-idr">'+rupiahTopup(price)+'</div><div class="topup-price-note">'+(disabled?'Melebihi stok':'Pilih nominal')+'</div></button>';
+    }).join("");
+}
+
+function selectRobuxAmount(amount){
+    const input=document.getElementById("topupRobuxAmount");
+    if(input) input.value=Number(amount);
+    topupAmountChanged();
+}
+
+function topupUseMaxStock(){
+    const stock=Number(robuxStoreSettings.stock_robux||0);
+    if(stock>0) selectRobuxAmount(stock);
+}
+
+function topupAmountChanged(){
+    const input=document.getElementById("topupRobuxAmount");
+    const msg=document.getElementById("topupPriceMessage");
+    const total=document.getElementById("topupTotalValue");
+    const amount=Number(input?.value||0);
+    const result=topupCalculatePrice(amount);
+    if(!result.ok){
+        if(msg) msg.innerText=result.message;
+        if(total) total.innerText="0 RBX · Rp0";
+        return;
+    }
+    if(msg) msg.innerText=result.parts?.length ? "Patokan harga: "+result.parts.join(" + ") : "";
+    if(total) total.innerText=amount.toLocaleString("id-ID")+" RBX · "+rupiahTopup(result.total);
+    document.querySelectorAll(".topup-price-card").forEach(function(card){card.classList.remove("active")});
+    document.querySelectorAll(".topup-price-card").forEach(function(card){
+        const text=card.querySelector(".topup-price-rbx")?.innerText||"";
+        const n=Number(text.replace(/[^0-9]/g,""));
+        if(n===amount) card.classList.add("active");
+    });
+    topupUpdateButton();
+}
+
+function topupChangePayment(){
+    const method=document.getElementById("topupPaymentMethod")?.value||"";
+    document.getElementById("topupQrisBox")?.classList.toggle("active",method==="QRIS");
+    document.getElementById("topupDanaBox")?.classList.toggle("active",method==="DANA");
+    topupUpdateButton();
+}
+
+function topupPreviewProof(){
+    const file=document.getElementById("topupProofFile")?.files?.[0];
+    const box=document.getElementById("topupProofPreview");
+    const img=document.getElementById("topupProofPreviewImage");
+    if(!file){ box?.classList.remove("active"); return; }
+    if(!["image/jpeg","image/png","image/webp"].includes(file.type) || file.size>5*1024*1024){
+        alert("Bukti pembayaran harus JPG, PNG, atau WEBP dan maksimal 5 MB.");
+        document.getElementById("topupProofFile").value="";
+        box?.classList.remove("active");
+        topupUpdateButton();
+        return;
+    }
+    const reader=new FileReader();
+    reader.onload=e=>{if(img) img.src=e.target.result; box?.classList.add("active"); topupUpdateButton();};
+    reader.readAsDataURL(file);
+}
+
+function topupUpdateButton(){
+    const btn=document.getElementById("topupOrderButton");
+    if(!btn) return;
+    const amount=Number(document.getElementById("topupRobuxAmount")?.value||0);
+    const validAmount=topupCalculatePrice(amount).ok;
+    const username=(document.getElementById("topupRobloxUsername")?.value||"").trim();
+    const validUsername=/^@[A-Za-z0-9_]{3,20}$/.test(username);
+    const wa=(document.getElementById("topupCustomerWA")?.value||"").trim();
+    const payment=(document.getElementById("topupPaymentMethod")?.value||"");
+    const proof=!!document.getElementById("topupProofFile")?.files?.[0];
+    const confirmed=document.getElementById("topupAgeConfirm")?.checked===true;
+    btn.disabled=!(robuxStoreSettings.active===true && Number(robuxStoreSettings.stock_robux||0)>0 && validAmount && validUsername && wa && payment && proof && confirmed);
+}
+
+async function loadRobuxStore(){
+    if(robuxStoreLoading) return;
+    robuxStoreLoading=true;
+    try{
+        const {data,error}=await supabaseClient.rpc("get_robux_store_v1");
+        if(error) throw error;
+        const result=Array.isArray(data)?data[0]:data;
+        robuxStoreSettings=result?.settings || {active:false,stock_robux:0};
+        robuxStorePrices=result?.prices || [];
+        robuxStoreLoaded=true;
+        topupRenderStock();
+        topupRenderPrices();
+        topupAmountChanged();
+        topupChangePayment();
+        topupUpdateButton();
+    }catch(error){
+        console.error("Robux store load error:",error);
+        topupSetMessage("Gagal memuat Top Up Robux: "+(error.message||"Error"),false);
+        const value=document.getElementById("topupStockValue"); if(value) value.innerText="GAGAL MEMUAT";
+    }finally{ robuxStoreLoading=false; }
+}
+
+async function submitRobuxTopup(){
+    topupUpdateButton();
+    const btn=document.getElementById("topupOrderButton");
+    if(btn?.disabled){ topupSetMessage("Lengkapi @username, jumlah Robux minimal 50, pembayaran, bukti pembayaran, dan centang peringatan terlebih dahulu.",false); return; }
+    const username=(document.getElementById("topupRobloxUsername")?.value||"").trim();
+    if(!/^@[A-Za-z0-9_]{3,20}$/.test(username)){
+        return topupSetMessage("Username Roblox wajib diawali @. Contoh: @lukasabiss",false);
+    }
+    const wa=(document.getElementById("topupCustomerWA")?.value||"").trim();
+    const payment=document.getElementById("topupPaymentMethod")?.value||"";
+    const amount=Number(document.getElementById("topupRobuxAmount")?.value||0);
+    const proof=document.getElementById("topupProofFile")?.files?.[0];
+    const price=topupCalculatePrice(amount);
+    if(!price.ok) return topupSetMessage(price.message,false);
+    const waWindow=window.open("","_blank");
+    btn.disabled=true; btn.innerText="MEMPROSES ORDER..."; topupSetMessage("Mengecek stok dan membuat order...",true);
+    try{
+        const {data,error}=await supabaseClient.rpc("create_robux_order_v1",{
+            p_username_roblox:username,
+            p_robux_amount:amount,
+            p_total_amount:price.total,
+            p_whatsapp_customer:wa,
+            p_payment_method:payment,
+            p_customer_18_confirmed:true
+        });
+        if(error) throw error;
+        const order=Array.isArray(data)?data[0]:data;
+        if(!order?.order_code) throw new Error("ID Order tidak dikembalikan database.");
+        topupSetMessage("Order "+order.order_code+" berhasil dibuat. Mengupload bukti pembayaran...",true);
+        const ext=(proof.name.split(".").pop()||"jpg").toLowerCase();
+        const proofPath="robux/"+order.order_code+"/"+randomFileName()+"."+ext;
+        const {error:uploadError}=await supabaseClient.storage.from("payment-proofs").upload(proofPath,proof,{cacheControl:"3600",contentType:proof.type,upsert:false});
+        if(uploadError) throw uploadError;
+        const {error:attachError}=await supabaseClient.rpc("attach_robux_payment_proof_v1",{p_order_code:order.order_code,p_proof_path:proofPath});
+        if(attachError) throw attachError;
+        const pesan="*TOP UP ROBUX BARU*\n\n*ID ORDER:* "+order.order_code+"\n*Username Roblox:* "+username+"\n*Jumlah:* "+amount.toLocaleString("id-ID")+" Robux\n*Total:* "+rupiahTopup(price.total)+"\n*WA Customer:* "+wa+"\n*Pembayaran:* "+payment+"\n*Verifikasi usia:* Customer menyatakan sudah membaca dan menyetujui persyaratan 18+.\n\nBukti pembayaran sudah diupload ke sistem.";
+        const url="https://wa.me/"+ADMIN_WA+"?text="+encodeURIComponent(pesan);
+        if(waWindow) waWindow.location.href=url; else window.location.href=url;
+        topupSetMessage("Order berhasil dibuat: "+order.order_code+". Stok tersisa "+Number(order.remaining_stock||0).toLocaleString("id-ID")+" RBX.",true);
+        await loadRobuxStore();
+        btn.innerText="ORDER BERHASIL";
+    }catch(error){
+        if(waWindow) waWindow.close();
+        console.error("Robux order error:",error);
+        topupSetMessage("Gagal membuat order: "+(error.message||"Error"),false);
+        btn.disabled=false; btn.innerText="🛒 PESAN TOP UP ROBUX";
+        await loadRobuxStore();
+    }
+}
+
+
+
+document.getElementById("topupRobloxUsername")?.addEventListener("input", topupUpdateButton);
+document.getElementById("topupCustomerWA")?.addEventListener("input", topupUpdateButton);
+document.getElementById("topupAgeConfirm")?.addEventListener("change", topupUpdateButton);
 </script>
 <style>
 /* ===== FAQ HOME: SMALL HEIGHT, WIDER HORIZONTAL, CENTERED UNDER CALC + JOKI ===== */
