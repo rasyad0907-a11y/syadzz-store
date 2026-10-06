@@ -4841,7 +4841,7 @@ textarea:focus{
 
 <div class="topup-card">
 <div class="topup-list-title">PILIHAN ROBUX & HARGA</div>
-<div class="topup-muted">Minimum pembelian 50 Robux. Harga otomatis sesuai daftar harga SYADZZ STORE dan tidak diatur admin.</div>
+<div class="topup-muted">Minimum pembelian 50 Robux. Nominal 50–500 yang tidak ada di kartu tetap bisa diketik dan harganya dihitung otomatis. Di atas 500 Robux berlaku Rp156 per Robux.</div>
 <div class="topup-price-grid" id="topupPriceGrid"><div class="topup-muted">Memuat harga...</div></div>
 <div class="topup-field">
 <label>🔢 Jumlah Robux</label>
@@ -11233,14 +11233,27 @@ const TOPUP_PRICE_LIST = {
 
 function topupCalculatePrice(amount){
     amount=Number(amount||0);
+
     if(!Number.isInteger(amount) || amount<50){
-        return {ok:false,message:"Minimal pembelian adalah 50 Robux."};
+        return {
+            ok:false,
+            message:"Minimal pembelian adalah 50 Robux."
+        };
     }
 
-    const stock=Number(robuxStoreSettings.stock_robux||0);
-
-    // Beli seluruh stok = Rp156 per Robux.
-    if(stock>0 && amount===stock){
+    /*
+     * ATURAN HARGA FINAL SYADZZ STORE
+     *
+     * 50–500 RBX:
+     * - nominal yang tepat di price list memakai harga price list.
+     * - nominal di antara price list dihitung proporsional dari
+     *   dua titik harga terdekat.
+     * - hasil custom dibulatkan ke Rp1.000 terdekat.
+     *
+     * Di atas 500 RBX:
+     * - Rp156 per Robux.
+     */
+    if(amount>500){
         const total=amount*156;
         return {
             ok:true,
@@ -11248,11 +11261,11 @@ function topupCalculatePrice(amount){
             unitPrice:156,
             baseTotal:amount*TOPUP_BASE_PRICE_PER_ROBUX,
             discountPercent:Math.round((1-(156/TOPUP_BASE_PRICE_PER_ROBUX))*100),
-            parts:[amount.toLocaleString("id-ID")+" Robux"]
+            custom:true,
+            parts:[amount.toLocaleString("id-ID")+" Robux × Rp156"]
         };
     }
 
-    // Nominal yang persis ada di price list.
     if(Object.prototype.hasOwnProperty.call(TOPUP_PRICE_LIST,amount)){
         const total=TOPUP_PRICE_LIST[amount];
         return {
@@ -11261,33 +11274,51 @@ function topupCalculatePrice(amount){
             unitPrice:total/amount,
             baseTotal:amount*TOPUP_BASE_PRICE_PER_ROBUX,
             discountPercent:Math.round((1-(total/amount/TOPUP_BASE_PRICE_PER_ROBUX))*100),
+            custom:false,
             parts:[amount.toLocaleString("id-ID")+" Robux"]
         };
     }
 
-    // Nominal custom dihitung dari pecahan price list terbesar yang tersedia.
-    let remaining=amount;
-    let total=0;
-    const parts=[];
-    const denominations=Object.keys(TOPUP_PRICE_LIST).map(Number).sort((a,b)=>b-a);
+    const anchors=Object.keys(TOPUP_PRICE_LIST)
+        .map(function(key){
+            return {
+                amount:Number(key),
+                price:Number(TOPUP_PRICE_LIST[key])
+            };
+        })
+        .filter(function(row){
+            return row.amount>=50 && row.amount<=500;
+        })
+        .sort(function(a,b){ return a.amount-b.amount; });
 
-    for(const denomination of denominations){
-        const qty=Math.floor(remaining/denomination);
-        if(qty<=0) continue;
-        remaining-=qty*denomination;
-        total+=qty*TOPUP_PRICE_LIST[denomination];
-        parts.push(qty===1
-            ? denomination.toLocaleString("id-ID")+" Robux"
-            : qty+" × "+denomination.toLocaleString("id-ID")+" Robux");
-        if(remaining===0) break;
+    let lower=null;
+    let upper=null;
+
+    for(const row of anchors){
+        if(row.amount<amount){
+            lower=row;
+        }else if(row.amount>amount){
+            upper=row;
+            break;
+        }
     }
 
-    if(remaining!==0){
+    if(!lower || !upper){
         return {
             ok:false,
-            message:"Nominal tersebut belum dapat dihitung dari price list yang tersedia."
+            message:"Nominal Robux tidak dapat dihitung."
         };
     }
+
+    const progress=(amount-lower.amount)/(upper.amount-lower.amount);
+    const rawTotal=lower.price + ((upper.price-lower.price)*progress);
+    const total=Math.max(
+        lower.price,
+        Math.min(
+            upper.price,
+            Math.round(rawTotal/1000)*1000
+        )
+    );
 
     return {
         ok:true,
@@ -11295,7 +11326,11 @@ function topupCalculatePrice(amount){
         unitPrice:total/amount,
         baseTotal:amount*TOPUP_BASE_PRICE_PER_ROBUX,
         discountPercent:Math.round((1-(total/amount/TOPUP_BASE_PRICE_PER_ROBUX))*100),
-        parts:parts
+        custom:true,
+        parts:[
+            amount.toLocaleString("id-ID")+" Robux",
+            "harga custom proporsional"
+        ]
     };
 }
 
@@ -11307,7 +11342,8 @@ function topupRenderPrices(){
     const stock=Number(robuxStoreSettings.stock_robux||0);
 
     // Tampilan dibuat seperti kartu pilihan Robux: ringkas, bergambar, dan tidak terlalu banyak pilihan.
-    const presetAmounts=[50,75,100,125,150,175,200,225,250,275,300,325,350,375,400,425,450,475,500];
+    const presetAmounts=[50,100,150,200,250,300,350,400,450,500];
+    // Semua 10 kartu tetap ditampilkan. Kartu yang melebihi stok hanya dibuat nonaktif.
     const available=presetAmounts.map(function(amount){
         const result=topupCalculatePrice(amount);
         if(!result.ok) return null;
@@ -11757,6 +11793,26 @@ document.getElementById("topupCustomerWA")?.addEventListener("input", topupUpdat
 /* Background Home selalu statis — tidak ada pulse, sweep, zoom, atau animasi. */
 body{animation:none !important;}
 #homePage{animation:none !important;background-image:inherit !important;}
+</style>
+
+<style id="topup-10-card-grid-fix">
+/* Top Up: 10 kartu, 4 kolom x maksimal 3 baris. */
+#topupPriceGrid .topup-price-offers{
+    display:grid !important;
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:12px !important;
+    width:100% !important;
+}
+@media(max-width:760px){
+    #topupPriceGrid .topup-price-offers{
+        grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    }
+}
+@media(max-width:480px){
+    #topupPriceGrid .topup-price-offers{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    }
+}
 </style>
 </body>
 </html>
