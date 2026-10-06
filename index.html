@@ -11248,7 +11248,7 @@ function topupCalculatePrice(amount){
      * - nominal yang tepat di price list memakai harga price list.
      * - nominal di antara price list dihitung proporsional dari
      *   dua titik harga terdekat.
-     * - hasil custom dibulatkan ke Rp1.000 terdekat.
+     * - hasil custom tidak dibulatkan; gunakan hasil proporsional asli.
      *
      * Di atas 500 RBX:
      * - Rp156 per Robux.
@@ -11312,13 +11312,7 @@ function topupCalculatePrice(amount){
 
     const progress=(amount-lower.amount)/(upper.amount-lower.amount);
     const rawTotal=lower.price + ((upper.price-lower.price)*progress);
-    const total=Math.max(
-        lower.price,
-        Math.min(
-            upper.price,
-            Math.round(rawTotal/1000)*1000
-        )
-    );
+    const total=rawTotal;
 
     return {
         ok:true,
