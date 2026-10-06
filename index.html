@@ -4837,11 +4837,6 @@ textarea:focus{
 <div><div class="topup-stock-label">Stok Robux Tersedia</div><div class="topup-stock-value" id="topupStockValue">Memuat...</div></div>
 <div class="topup-status-badge" id="topupStockStatus">MEMUAT</div>
 </div>
-<div class="topup-warning topup-warning-elegant">
-<div class="topup-warning-head"><div class="topup-warning-icon">⚠️</div><div class="topup-warning-title">PERINGATAN PENTING</div></div>
-<div class="topup-warning-text">Pastikan kamu memasukkan <strong>username Roblox yang benar</strong> dan akun yang digunakan memenuhi persyaratan layanan. SYADZZ STORE tidak bertanggung jawab atas kendala yang terjadi apabila customer tetap melakukan order dengan akun yang tidak memenuhi persyaratan tersebut.</div>
-<label class="topup-warning-check"><input type="checkbox" id="topupAgeConfirm"><span>Saya sudah membaca dan memahami peringatan tersebut.</span></label>
-</div>
 </div>
 
 <div class="topup-card">
@@ -4912,6 +4907,27 @@ textarea:focus{
 <button class="btn btn-secondary topup-order-btn" type="button" onclick="showPage('homePage')">⬅ KEMBALI</button>
 </div>
 </div>
+</div>
+
+<!-- TOP UP ROBUX WARNING MODAL: tampil hanya saat customer menekan PESAN -->
+<div id="topupWarningModal" class="topup-warning-modal" aria-hidden="true">
+  <div class="topup-warning-backdrop" data-topup-warning-close="1"></div>
+  <div class="topup-warning-dialog" role="dialog" aria-modal="true" aria-labelledby="topupWarningTitle">
+    <div class="topup-warning-dialog-head">
+      <div class="topup-warning-dialog-icon">⚠️</div>
+      <div>
+        <div id="topupWarningTitle" class="topup-warning-dialog-title">PERINGATAN PENTING</div>
+        <div class="topup-warning-dialog-subtitle">Harap periksa kembali sebelum order.</div>
+      </div>
+    </div>
+    <div class="topup-warning-dialog-text">
+      Pastikan kamu memasukkan <strong>username Roblox yang benar</strong> dan akun yang digunakan memenuhi persyaratan layanan. SYADZZ STORE tidak bertanggung jawab atas kendala yang terjadi apabila customer tetap melakukan order dengan akun yang tidak memenuhi persyaratan tersebut.
+    </div>
+    <div class="topup-warning-dialog-actions">
+      <button type="button" class="btn btn-secondary" id="topupWarningCancel">BATAL</button>
+      <button type="button" class="btn btn-primary" id="topupWarningContinue">SAYA MENGERTI &amp; LANJUTKAN</button>
+    </div>
+  </div>
 </div>
 
 <div class="page" id="allGameServicesPage">
@@ -11515,9 +11531,8 @@ function topupUpdateButton(){
     const wa=(document.getElementById("topupCustomerWA")?.value||"").trim();
     const payment=(document.getElementById("topupPaymentMethod")?.value||"");
     const proof=!!document.getElementById("topupProofFile")?.files?.[0];
-    const confirmed=document.getElementById("topupAgeConfirm")?.checked===true;
     const active=robuxStoreSettings.active===true;
-    btn.disabled=!(active && stock>0 && validAmount && validUsername && wa && payment && proof && confirmed);
+    btn.disabled=!(active && stock>0 && validAmount && validUsername && wa && payment && proof);
 }
 
 async function loadRobuxStore(){
@@ -11560,24 +11575,11 @@ async function loadRobuxStore(){
             active:(liveActive===true || liveActive===1 || String(liveActive).toLowerCase()==="true"),
             stock_robux:Number(liveStock)||0
         };
-
-        // Ambil harga langsung dari tabel yang memang dipakai database sekarang:
-        // robux_prices(robux_amount, price).
-        const priceRequest=await supabaseClient
-            .from("robux_prices")
-            .select("robux_amount, price")
-            .order("robux_amount", {ascending:true});
-
-        if(priceRequest.error) throw priceRequest.error;
-
-        robuxStorePrices=Array.isArray(priceRequest.data) ? priceRequest.data.map(function(row){
-            return {
-                robux_amount:Number(row?.robux_amount || 0),
-                price:Number(row?.price || 0)
-            };
-        }).filter(function(row){
-            return Number.isInteger(row.robux_amount) && row.robux_amount>0 && row.price>=0;
-        }) : [];
+        // Harga customer ditetapkan langsung oleh SYADZZ STORE.
+        // Tidak membaca robux_prices agar harga lama di database tidak menimpa Index.
+        robuxStorePrices=Object.keys(TOPUP_PRICE_LIST).map(function(key){
+            return {robux_amount:Number(key),price:Number(TOPUP_PRICE_LIST[key])};
+        });
 
         robuxStoreLoaded=true;
         topupRenderStock();
@@ -11593,29 +11595,9 @@ async function loadRobuxStore(){
         // Jangan biarkan tabel hilang hanya karena RPC stok gagal.
         // Harga tetap bisa ditampilkan dari daftar harga yang sudah menjadi
         // patokan SYADZZ STORE, sedangkan status stok ditandai gagal dimuat.
-        if(!robuxStorePrices.length){
-            robuxStorePrices=[
-                {robux_amount:50,price:10000},
-                {robux_amount:75,price:15000},
-                {robux_amount:100,price:16000},
-                {robux_amount:125,price:21000},
-                {robux_amount:150,price:24000},
-                {robux_amount:175,price:29000},
-                {robux_amount:200,price:32000},
-                {robux_amount:225,price:37000},
-                {robux_amount:250,price:40000},
-                {robux_amount:275,price:45000},
-                {robux_amount:300,price:48000},
-                {robux_amount:325,price:53000},
-                {robux_amount:350,price:56000},
-                {robux_amount:375,price:61000},
-                {robux_amount:400,price:64000},
-                {robux_amount:425,price:69000},
-                {robux_amount:450,price:72000},
-                {robux_amount:475,price:77000},
-                {robux_amount:500,price:78000}
-            ];
-        }
+        robuxStorePrices=Object.keys(TOPUP_PRICE_LIST).map(function(key){
+            return {robux_amount:Number(key),price:Number(TOPUP_PRICE_LIST[key])};
+        });
 
         robuxStoreSettings={active:false,stock_robux:0};
         topupRenderStock();
@@ -11634,10 +11616,72 @@ async function loadRobuxStore(){
     }
 }
 
+let topupWarningConfirmed=false;
+
+function showTopupWarning(){
+    const modal=document.getElementById("topupWarningModal");
+    if(!modal) return false;
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden","false");
+    return true;
+}
+
+function closeTopupWarning(){
+    const modal=document.getElementById("topupWarningModal");
+    if(!modal) return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+}
+
+function setupTopupWarningModal(){
+    const modal=document.getElementById("topupWarningModal");
+    if(!modal) return;
+    document.getElementById("topupWarningCancel")?.addEventListener("click",closeTopupWarning);
+    modal.querySelector(".topup-warning-backdrop")?.addEventListener("click",closeTopupWarning);
+    document.getElementById("topupWarningContinue")?.addEventListener("click",async function(){
+        topupWarningConfirmed=true;
+        closeTopupWarning();
+        await submitRobuxTopup();
+    });
+}
+
+// ===== TELEGRAM NOTIFICATION =====
+// Isi token/chat/topic Telegram milik admin di sini jika ingin notifikasi otomatis dari Index.
+// Untuk keamanan, idealnya pindahkan pengiriman ini ke Edge Function Supabase.
+const SYADZZ_TELEGRAM_BOT_TOKEN = "ISI_BOT_TOKEN_TELEGRAM";
+const SYADZZ_TELEGRAM_CHAT_ID = "ISI_CHAT_ID_TELEGRAM";
+const SYADZZ_TELEGRAM_THREAD_ID = "";
+
+async function sendRobuxTelegramNotification(order, username, amount, total, wa, payment){
+    if(!SYADZZ_TELEGRAM_BOT_TOKEN || SYADZZ_TELEGRAM_BOT_TOKEN === "ISI_BOT_TOKEN_TELEGRAM") return;
+    if(!SYADZZ_TELEGRAM_CHAT_ID || SYADZZ_TELEGRAM_CHAT_ID === "ISI_CHAT_ID_TELEGRAM") return;
+    const text =
+        "🟡 TOP UP ROBUX BARU\n\n"+
+        "🆔 ID ORDER: "+order.order_code+"\n"+
+        "👤 Username Roblox: "+username+"\n"+
+        "💰 Jumlah: "+Number(amount||0).toLocaleString("id-ID")+" Robux\n"+
+        "💵 Total: "+rupiahTopup(total)+"\n"+
+        "📱 WA Customer: "+wa+"\n"+
+        "💳 Pembayaran: "+payment+"\n"+
+        "📸 Bukti pembayaran: SUDAH DIUPLOAD\n\n"+
+        "⚡ Ada order Top Up Robux baru di SYADZZ STORE.";
+    const body={chat_id:SYADZZ_TELEGRAM_CHAT_ID,text:text,parse_mode:"HTML"};
+    if(SYADZZ_TELEGRAM_THREAD_ID) body.message_thread_id=Number(SYADZZ_TELEGRAM_THREAD_ID);
+    try{
+        await fetch("https://api.telegram.org/bot"+SYADZZ_TELEGRAM_BOT_TOKEN+"/sendMessage",{
+            method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)
+        });
+    }catch(e){ console.warn("Telegram notification gagal:",e); }
+}
+
 async function submitRobuxTopup(){
     topupUpdateButton();
+    if(!topupWarningConfirmed){
+        showTopupWarning();
+        return;
+    }
     const btn=document.getElementById("topupOrderButton");
-    if(btn?.disabled){ topupSetMessage("Lengkapi @username, jumlah Robux minimal 50, pembayaran, bukti pembayaran, dan centang peringatan terlebih dahulu.",false); return; }
+    if(btn?.disabled){ topupSetMessage("Lengkapi @username, jumlah Robux minimal 50, pembayaran, dan bukti pembayaran terlebih dahulu.",false); return; }
     const username=(document.getElementById("topupRobloxUsername")?.value||"").trim();
     if(!/^@[A-Za-z0-9_]{3,20}$/.test(username)){
         return topupSetMessage("Username Roblox wajib diawali @. Contoh: @lukasabiss",false);
@@ -11667,19 +11711,33 @@ async function submitRobuxTopup(){
         const proofPath="robux/"+order.order_code+"/"+randomFileName()+"."+ext;
         const {error:uploadError}=await supabaseClient.storage.from("payment-proofs").upload(proofPath,proof,{cacheControl:"3600",contentType:proof.type,upsert:false});
         if(uploadError) throw uploadError;
-        const {error:attachError}=await supabaseClient.rpc("attach_robux_payment_proof_v1",{p_order_id:order.id,p_proof_path:proofPath});
+        let robuxOrderId=order?.order_id||order?.id||null;
+        if(!robuxOrderId){
+            const lookup=await supabaseClient
+                .from("robux_orders")
+                .select("id")
+                .eq("order_code",order.order_code)
+                .maybeSingle();
+            if(lookup.error) throw lookup.error;
+            robuxOrderId=lookup.data?.id||null;
+        }
+        if(!robuxOrderId) throw new Error("ID order tidak ditemukan untuk mengaitkan bukti pembayaran.");
+        const {error:attachError}=await supabaseClient.rpc("attach_robux_payment_proof_v1",{p_order_id:robuxOrderId,p_proof_path:proofPath});
         if(attachError) throw attachError;
+        await sendRobuxTelegramNotification(order, username, amount, price.total, wa, payment);
         const pesan="*TOP UP ROBUX BARU*\n\n*ID ORDER:* "+order.order_code+"\n*Username Roblox:* "+username+"\n*Jumlah:* "+amount.toLocaleString("id-ID")+" Robux\n*Total:* "+rupiahTopup(price.total)+"\n*WA Customer:* "+wa+"\n*Pembayaran:* "+payment+"\n*Verifikasi usia:* Customer menyatakan sudah membaca dan menyetujui persyaratan 18+.\n\nBukti pembayaran sudah diupload ke sistem.";
         const url="https://wa.me/"+ADMIN_WA+"?text="+encodeURIComponent(pesan);
         if(waWindow) waWindow.location.href=url; else window.location.href=url;
         topupSetMessage("Order berhasil dibuat: "+order.order_code+". Stok tersisa "+Number(order.remaining_stock||0).toLocaleString("id-ID")+" RBX.",true);
         await loadRobuxStore();
         btn.innerText="ORDER BERHASIL";
+        topupWarningConfirmed=false;
     }catch(error){
         if(waWindow) waWindow.close();
         console.error("Robux order error:",error);
         topupSetMessage("Gagal membuat order: "+(error.message||"Error"),false);
         btn.disabled=false; btn.innerText="🛒 PESAN TOP UP ROBUX";
+        topupWarningConfirmed=false;
         await loadRobuxStore();
     }
 }
@@ -11688,9 +11746,22 @@ async function submitRobuxTopup(){
 
 document.getElementById("topupRobloxUsername")?.addEventListener("input", topupUpdateButton);
 document.getElementById("topupCustomerWA")?.addEventListener("input", topupUpdateButton);
-document.getElementById("topupAgeConfirm")?.addEventListener("change", topupUpdateButton);
 </script>
 <style>
+/* ===== TOP UP WARNING MODAL ===== */
+.topup-warning-modal{display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;padding:18px}
+.topup-warning-modal.open{display:flex}
+.topup-warning-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(5px)}
+.topup-warning-dialog{position:relative;width:min(520px,100%);border:1px solid rgba(255,217,0,.32);border-radius:20px;background:linear-gradient(145deg,#15151f,#0d0d14);box-shadow:0 20px 60px rgba(0,0,0,.45);padding:20px;color:#fff}
+.topup-warning-dialog-head{display:flex;gap:12px;align-items:center}
+.topup-warning-dialog-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;background:rgba(255,193,7,.12);font-size:23px}
+.topup-warning-dialog-title{font-size:15px;font-weight:900;letter-spacing:.7px;color:#ffd900}
+.topup-warning-dialog-subtitle{margin-top:3px;color:#9999aa;font-size:11px}
+.topup-warning-dialog-text{margin-top:17px;padding:14px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.06);font-size:12px;line-height:1.7;color:#d8d8e0}
+.topup-warning-dialog-text strong{color:#ffd900}
+.topup-warning-dialog-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px;flex-wrap:wrap}
+@media(max-width:520px){.topup-warning-dialog-actions .btn{width:100%}}
+
 /* ===== FAQ HOME: SMALL HEIGHT, WIDER HORIZONTAL, CENTERED UNDER CALC + JOKI ===== */
 #homePage .faq-home-entry-wrap{
     margin:12px auto 2px;
