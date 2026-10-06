@@ -11707,15 +11707,22 @@ async function submitRobuxTopup(){
     const waWindow=window.open("","_blank");
     btn.disabled=true; btn.innerText="MEMPROSES ORDER..."; topupSetMessage("Mengecek stok dan membuat order...",true);
     try{
-        const {data,error}=await supabaseClient.rpc("create_robux_order_v1",{
-            p_username_roblox:username,
-            p_robux_amount:amount,
-            p_total_amount:price.total,
-            p_whatsapp_customer:wa,
-            p_payment_method:payment,
+        // TOP UP ROBUX = GUEST / TANPA LOGIN.
+        // Gunakan RPC 6-parameter secara eksplisit. Function ini adalah
+        // create_robux_order_v1(text,bigint,bigint,text,text,boolean).
+        const rpcParams={
+            p_username_roblox:String(username),
+            p_robux_amount:Math.trunc(amount),
+            p_total_amount:Math.trunc(price.total),
+            p_whatsapp_customer:String(wa),
+            p_payment_method:String(payment).toLowerCase(),
             p_customer_18_confirmed:true
-        });
-        if(error) throw error;
+        };
+        const {data,error}=await supabaseClient.rpc("create_robux_order_v1",rpcParams);
+        if(error){
+            console.error("create_robux_order_v1 error:",error);
+            throw new Error(error.message || "Gagal membuat order Top Up Robux.");
+        }
         const order=Array.isArray(data)?data[0]:data;
         if(!order?.order_code) throw new Error("ID Order tidak dikembalikan database.");
         topupSetMessage("Order "+order.order_code+" berhasil dibuat. Mengupload bukti pembayaran...",true);
