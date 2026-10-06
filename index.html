@@ -4921,7 +4921,7 @@ textarea:focus{
       </div>
     </div>
     <div class="topup-warning-dialog-text">
-      Pastikan kamu memasukkan <strong>username Roblox yang benar</strong> dan <strong>akun Roblox yang digunakan sudah memenuhi persyaratan usia 18+</strong>. SYADZZ STORE tidak bertanggung jawab atas kendala yang terjadi apabila customer tetap melakukan order menggunakan akun yang tidak memenuhi persyaratan usia 18+.
+      Pastikan akun Roblox yang digunakan sudah memenuhi persyaratan usia 18+.<br><br>SYADZZ STORE tidak bertanggung jawab atas kendala yang terjadi apabila customer tetap melakukan order menggunakan akun yang tidak memenuhi persyaratan tersebut.
     </div>
     <div class="topup-warning-dialog-actions">
       <button type="button" class="btn btn-secondary" id="topupWarningCancel" onclick="closeTopupWarning()">BATAL</button>
@@ -10187,6 +10187,20 @@ async function kirimPesanan(){
             buktiText;
 
 
+        // Telegram admin: gunakan bot ORDER BARU yang sama.
+        // Notifikasi gagal tidak membatalkan order karena order sudah tersimpan.
+        await sendJokiTelegramNotification(
+            order,
+            usernameBersih,
+            waBersih,
+            paymentBersih,
+            namaGame,
+            orderNote,
+            proofUploaded,
+            selectedOrderMode === "combo"
+        );
+
+
         const url =
             "https://wa.me/" +
             ADMIN_WA +
@@ -10424,209 +10438,97 @@ CEK ORDER
 ========================= */
 
 async function cekPesanan(){
-
-    const code =
-        document.getElementById(
-            "checkOrderCode"
-        ).value
-        .trim()
-        .toUpperCase();
-
-
-    const result =
-        document.getElementById(
-            "checkResult"
-        );
-
+    const code = String(document.getElementById("checkOrderCode")?.value || "").trim().toUpperCase();
+    const result = document.getElementById("checkResult");
+    if(!result) return;
 
     if(!code){
-
-        result.className =
-            "order-result active";
-
-        result.innerHTML =
-            "Masukkan ID Order terlebih dahulu.";
-
+        result.className = "order-result active";
+        result.innerHTML = "Masukkan ID Order terlebih dahulu.";
         return;
-
     }
 
-
-    result.className =
-        "order-result active";
-
-    result.innerHTML =
-        "Mengecek pesanan...";
-
+    result.className = "order-result active";
+    result.innerHTML = "Mengecek pesanan...";
 
     try{
+        /* Top Up Robux memakai RPC aman agar customer guest (anon) tetap bisa cek order. */
+        if(code.startsWith("RBX-")){
+            const {data, error} = await supabaseClient.rpc("get_robux_order_status_v1", {
+                p_order_code: code
+            });
 
-        const {
-            data,
-            error
-        } =
-            await supabaseClient.rpc(
-                "get_order_status_v2",
-                {
-                    p_order_code:
-                        code
-                }
-            );
-
-
-        if(error){
-
-            result.innerHTML =
-                "Gagal mengecek pesanan:<br>" +
-                escapeHtml(
-                    error.message
-                );
-
-            return;
-
-        }
-
-
-        const order =
-            Array.isArray(data)
-                ? data[0]
-                : data;
-
-
-        if(!order){
-
-            result.innerHTML =
-                "ID Order tidak ditemukan.";
-
-            return;
-
-        }
-
-
-        let customerNote = "";
-
-        try{
-
-            const noteResponse =
-                await supabaseClient.rpc(
-                    "get_customer_order_note_v1",
-                    {
-                        p_order_code: code
-                    }
-                );
-
-            if(!noteResponse.error){
-
-                const noteRow =
-                    Array.isArray(noteResponse.data)
-                        ? noteResponse.data[0]
-                        : noteResponse.data;
-
-                customerNote =
-                    String(noteRow?.customer_note || "").trim();
-
+            if(error) throw error;
+            if(!data){
+                result.innerHTML = "ID Order Top Up Robux tidak ditemukan.";
+                return;
             }
 
+            const statusMap = {
+                pending:"MENUNGGU VERIFIKASI",
+                waiting_payment:"MENUNGGU PEMBAYARAN",
+                paid:"DIBAYAR",
+                processing:"DIPROSES",
+                completed:"SELESAI",
+                rejected:"DITOLAK",
+                cancelled:"DIBATALKAN"
+            };
+            const statusLabel = statusMap[String(data.status || "")] || String(data.status || "-");
+            const created = data.created_at
+                ? new Date(data.created_at).toLocaleString("id-ID", {timeZone:"Asia/Jakarta"})
+                : "-";
+
+            result.innerHTML =
+                "<div><b>ID Order:</b> " + escapeHtml(data.order_code) + "</div>" +
+                "<div style='margin-top:8px'><b>Username Roblox:</b> " + escapeHtml(data.roblox_username) + "</div>" +
+                "<div style='margin-top:8px'><b>Jumlah Robux:</b> " + Number(data.robux_amount || 0).toLocaleString("id-ID") + " Robux</div>" +
+                "<div style='margin-top:8px'><b>Total:</b> " + rupiahTopup(data.total_price) + "</div>" +
+                "<div style='margin-top:8px'><b>Pembayaran:</b> " + escapeHtml(data.payment_method || "-") + "</div>" +
+                "<div style='margin-top:8px'><b>Tanggal:</b> " + escapeHtml(created) + "</div>" +
+                "<div class='order-status'>" + escapeHtml(statusLabel) + "</div>";
+            return;
+        }
+
+        const {data, error} = await supabaseClient.rpc("get_order_status_v2", {p_order_code: code});
+        if(error){
+            result.innerHTML = "Gagal mengecek pesanan:<br>" + escapeHtml(error.message);
+            return;
+        }
+
+        const order = Array.isArray(data) ? data[0] : data;
+        if(!order){
+            result.innerHTML = "ID Order tidak ditemukan.";
+            return;
+        }
+
+        let customerNote = "";
+        try{
+            const noteResponse = await supabaseClient.rpc("get_customer_order_note_v1", {p_order_code: code});
+            if(!noteResponse.error){
+                const noteRow = Array.isArray(noteResponse.data) ? noteResponse.data[0] : noteResponse.data;
+                customerNote = String(noteRow?.customer_note || "").trim();
+            }
         }catch(noteError){
             console.warn("Catatan customer tidak dapat dimuat:", noteError);
         }
 
-
-        const mulai =
-            order.started_at
-                ? new Date(
-                    order.started_at
-                ).toLocaleString(
-                    "id-ID",
-                    {
-                        timeZone:
-                            "Asia/Jakarta"
-                    }
-                )
-                : "-";
-
-
-        const selesai =
-            order.finish_at
-                ? new Date(
-                    order.finish_at
-                ).toLocaleString(
-                    "id-ID",
-                    {
-                        timeZone:
-                            "Asia/Jakarta"
-                    }
-                )
-                : "-";
-
+        const mulai = order.started_at
+            ? new Date(order.started_at).toLocaleString("id-ID", {timeZone:"Asia/Jakarta"}) : "-";
+        const selesai = order.finish_at
+            ? new Date(order.finish_at).toLocaleString("id-ID", {timeZone:"Asia/Jakarta"}) : "-";
 
         result.innerHTML =
-
-            "<div>" +
-                "<b>ID Order:</b> " +
-                escapeHtml(
-                    order.order_code
-                ) +
-            "</div>" +
-
-            "<div style='margin-top:8px'>" +
-                "<b>Paket:</b> " +
-                escapeHtml(
-                    order.package_name
-                ) +
-            "</div>" +
-
-            "<div style='margin-top:8px'>" +
-                "<b>Quantity:</b> " +
-                order.quantity +
-                (
-                    order.quantity === 1
-                        ? " Paket"
-                        : " Hari"
-                ) +
-            "</div>" +
-
-            "<div style='margin-top:8px'>" +
-                "<b>Game / Map:</b> " +
-                escapeHtml(
-                    order.game_map
-                ) +
-            "</div>" +
-
-            "<div style='margin-top:8px'>" +
-                "<b>Total:</b> " +
-                rupiah(
-                    order.total_amount
-                ) +
-            "</div>" +
-
-            "<div style='margin-top:8px'>" +
-                "<b>Mulai:</b> " +
-                mulai +
-            "</div>" +
-
-            "<div style='margin-top:8px'>" +
-                "<b>Selesai otomatis:</b> " +
-                selesai +
-            "</div>" +
-
-            "<div class='order-status'>" +
-                escapeHtml(
-                    order.status
-                ) +
-            "</div>";
-
-
+            "<div><b>ID Order:</b> " + escapeHtml(order.order_code) + "</div>" +
+            "<div style='margin-top:8px'><b>Paket:</b> " + escapeHtml(order.package_name) + "</div>" +
+            "<div style='margin-top:8px'><b>Quantity:</b> " + order.quantity + (order.quantity === 1 ? " Paket" : " Hari") + "</div>" +
+            "<div style='margin-top:8px'><b>Game / Map:</b> " + escapeHtml(order.game_map) + "</div>" +
+            "<div style='margin-top:8px'><b>Total:</b> " + rupiah(order.total_amount) + "</div>" +
+            "<div style='margin-top:8px'><b>Mulai:</b> " + mulai + "</div>" +
+            "<div style='margin-top:8px'><b>Selesai otomatis:</b> " + selesai + "</div>" +
+            "<div class='order-status'>" + escapeHtml(order.status) + "</div>";
     }catch(error){
-
-        result.innerHTML =
-            "Terjadi kesalahan:<br>" +
-            escapeHtml(
-                error.message
-            );
-
+        result.innerHTML = "Terjadi kesalahan:<br>" + escapeHtml(error.message);
     }
-
 }
 
 
@@ -11647,37 +11549,80 @@ function setupTopupWarningModal(){
 
 setupTopupWarningModal();
 
-// ===== TELEGRAM TOP UP ROBUX VIA SUPABASE EDGE FUNCTION =====
-// Token Telegram tidak disimpan di browser. Pengiriman dilakukan oleh
-// Edge Function `telegram-store-notification` menggunakan Supabase Secrets.
-async function sendRobuxTelegramNotification(order, username, amount, total, wa, payment){
+// ===== TELEGRAM NOTIFICATION ADMIN =====
+// Menggunakan bot ORDER BARU yang sama untuk notifikasi Top Up Robux dan Joki/Combo.
+// Token disimpan di halaman ini karena pengiriman dilakukan langsung dari Index.
+const SYADZZ_TELEGRAM_BOT_TOKEN = "8797566904:AAFZf1f1QhcnigoQEmFA0v_diL8N6KdtIgg";
+const SYADZZ_TELEGRAM_CHAT_ID = "8127492529";
+const SYADZZ_TELEGRAM_THREAD_ID = "";
+
+async function sendSyadzzTelegram(text){
+    if(!SYADZZ_TELEGRAM_BOT_TOKEN || !SYADZZ_TELEGRAM_CHAT_ID) return false;
+
+    const body = {
+        chat_id: SYADZZ_TELEGRAM_CHAT_ID,
+        text: String(text || "")
+    };
+
+    if(SYADZZ_TELEGRAM_THREAD_ID){
+        body.message_thread_id = Number(SYADZZ_TELEGRAM_THREAD_ID);
+    }
+
     try{
-        const {data,error}=await supabaseClient.functions.invoke("telegram-store-notification",{
-            body:{
-                type:"robux",
-                order:{
-                    order_code:order?.order_code,
-                    roblox_username:username,
-                    robux_amount:amount,
-                    total_price:total,
-                    whatsapp_customer:wa,
-                    payment_method:payment
-                }
+        const response = await fetch(
+            "https://api.telegram.org/bot" +
+            SYADZZ_TELEGRAM_BOT_TOKEN +
+            "/sendMessage",
+            {
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify(body)
             }
-        });
-        if(error){
-            console.warn("Telegram Top Up Robux gagal dikirim:",error);
+        );
+
+        if(!response.ok){
+            console.warn("Telegram notification gagal:", response.status);
             return false;
         }
-        if(data && data.ok === false){
-            console.warn("Telegram Top Up Robux ditolak function:",data);
-            return false;
-        }
+
         return true;
-    }catch(error){
-        console.warn("Telegram Top Up Robux gagal:",error);
+    }catch(e){
+        console.warn("Telegram notification gagal:", e);
         return false;
     }
+}
+
+async function sendRobuxTelegramNotification(order, username, amount, total, wa, payment){
+    const text =
+        "🟡 TOP UP ROBUX BARU\n\n"+
+        "🆔 ID ORDER: "+order.order_code+"\n"+
+        "👤 Username Roblox: "+username+"\n"+
+        "💰 Jumlah: "+Number(amount||0).toLocaleString("id-ID")+" Robux\n"+
+        "💵 Total: "+rupiahTopup(total)+"\n"+
+        "📱 WA Customer: "+wa+"\n"+
+        "💳 Pembayaran: "+payment+"\n"+
+        "📸 Bukti pembayaran: SUDAH DIUPLOAD\n\n"+
+        "⚡ Ada order Top Up Robux baru di SYADZZ STORE.";
+
+    return sendSyadzzTelegram(text);
+}
+
+async function sendJokiTelegramNotification(order, username, customerWA, payment, gameMap, orderNote, proofUploaded, isCombo){
+    const text =
+        "🟢 ORDER BARU\n\n"+
+        "🆔 ID ORDERAN: "+String(order.order_code || "-")+"\n"+
+        "📦 Jenis: "+(isCombo ? "COMBO" : "JOKI")+"\n"+
+        "📦 Paket: "+String(order.package_name || (isCombo ? "Combo" : "-"))+"\n"+
+        "👤 Username Roblox: "+String(username || "-")+"\n"+
+        "🎮 Game / Map: "+String(gameMap || "-")+"\n"+
+        "📱 WA Customer: "+String(customerWA || "-")+"\n"+
+        "💳 Pembayaran: "+String(payment || "-")+"\n"+
+        "💵 Total: "+rupiah(Number(order.total_amount || 0))+"\n"+
+        "📝 Catatan: "+String(orderNote || "-")+"\n"+
+        "📸 Bukti pembayaran: "+(proofUploaded ? "SUDAH DIUPLOAD" : "BELUM BERHASIL DIUPLOAD")+"\n\n"+
+        "⚡ Ada order baru di SYADZZ STORE.";
+
+    return sendSyadzzTelegram(text);
 }
 
 async function getRobuxOrderIdByCode(orderCode){
@@ -11707,22 +11652,15 @@ async function submitRobuxTopup(){
     const waWindow=window.open("","_blank");
     btn.disabled=true; btn.innerText="MEMPROSES ORDER..."; topupSetMessage("Mengecek stok dan membuat order...",true);
     try{
-        // TOP UP ROBUX = GUEST / TANPA LOGIN.
-        // Gunakan RPC 6-parameter secara eksplisit. Function ini adalah
-        // create_robux_order_v1(text,bigint,bigint,text,text,boolean).
-        const rpcParams={
-            p_username_roblox:String(username),
-            p_robux_amount:Math.trunc(amount),
-            p_total_amount:Math.trunc(price.total),
-            p_whatsapp_customer:String(wa),
-            p_payment_method:String(payment).toLowerCase(),
+        const {data,error}=await supabaseClient.rpc("create_robux_order_v1",{
+            p_username_roblox:username,
+            p_robux_amount:amount,
+            p_total_amount:price.total,
+            p_whatsapp_customer:wa,
+            p_payment_method:payment,
             p_customer_18_confirmed:true
-        };
-        const {data,error}=await supabaseClient.rpc("create_robux_order_v1",rpcParams);
-        if(error){
-            console.error("create_robux_order_v1 error:",error);
-            throw new Error(error.message || "Gagal membuat order Top Up Robux.");
-        }
+        });
+        if(error) throw error;
         const order=Array.isArray(data)?data[0]:data;
         if(!order?.order_code) throw new Error("ID Order tidak dikembalikan database.");
         topupSetMessage("Order "+order.order_code+" berhasil dibuat. Mengupload bukti pembayaran...",true);
@@ -11738,7 +11676,7 @@ async function submitRobuxTopup(){
         const {error:attachError}=await supabaseClient.rpc("attach_robux_payment_proof_v1",{p_order_id:robuxOrderId,p_proof_path:proofPath});
         if(attachError) throw attachError;
         await sendRobuxTelegramNotification(order, username, amount, price.total, wa, payment);
-        const pesan="*TOP UP ROBUX BARU*\n\n*ID ORDER:* "+order.order_code+"\n*Username Roblox:* "+username+"\n*Jumlah:* "+amount.toLocaleString("id-ID")+" Robux\n*Total:* "+rupiahTopup(price.total)+"\n*WA Customer:* "+wa+"\n*Pembayaran:* "+payment+"\n*Verifikasi usia:* Customer menyatakan sudah membaca dan menyetujui persyaratan 18+.\n\nBukti pembayaran sudah diupload ke sistem.";
+        const pesan="TOP UP ROBUX BARU\n"+"ID ORDER: "+order.order_code+"\n"+"Username Roblox: "+username+"\n"+"Jumlah Robux: "+amount.toLocaleString("id-ID")+"\n"+"Total: "+rupiahTopup(price.total)+"\n"+"WA Customer: "+wa+"\n"+"Pembayaran: "+payment+"\n"+"Verifikasi usia: Customer menyatakan sudah memenuhi persyaratan 18+.\n"+"Bukti pembayaran sudah diupload ke sistem.";
         const url="https://wa.me/"+ADMIN_WA+"?text="+encodeURIComponent(pesan);
         if(waWindow) waWindow.location.href=url; else window.location.href=url;
         topupSetMessage("Order berhasil dibuat: "+order.order_code+". Stok tersisa "+Number(order.remaining_stock||0).toLocaleString("id-ID")+" RBX.",true);
