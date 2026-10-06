@@ -10459,31 +10459,32 @@ async function cekPesanan(){
             });
 
             if(error) throw error;
-            if(!data){
+
+            /*
+             * get_robux_order_status_v1 mengembalikan RETURNS TABLE,
+             * sehingga Supabase/PostgREST mengirim hasil sebagai array.
+             * Ambil baris pertama sebelum membaca field order.
+             */
+            const order = Array.isArray(data) ? data[0] : data;
+
+            if(!order){
                 result.innerHTML = "ID Order Top Up Robux tidak ditemukan.";
                 return;
             }
 
-            const statusMap = {
-                pending:"MENUNGGU VERIFIKASI",
-                waiting_payment:"MENUNGGU PEMBAYARAN",
-                paid:"DIBAYAR",
-                processing:"DIPROSES",
-                completed:"SELESAI",
-                rejected:"DITOLAK",
-                cancelled:"DIBATALKAN"
-            };
-            const statusLabel = statusMap[String(data.status || "")] || String(data.status || "-");
-            const created = data.created_at
-                ? new Date(data.created_at).toLocaleString("id-ID", {timeZone:"Asia/Jakarta"})
+            const created = order.created_at
+                ? new Date(order.created_at).toLocaleString("id-ID", {timeZone:"Asia/Jakarta"})
                 : "-";
 
+            /* Status dari RPC sudah berupa label Indonesia. */
+            const statusLabel = String(order.status || "-");
+
             result.innerHTML =
-                "<div><b>ID Order:</b> " + escapeHtml(data.order_code) + "</div>" +
-                "<div style='margin-top:8px'><b>Username Roblox:</b> " + escapeHtml(data.roblox_username) + "</div>" +
-                "<div style='margin-top:8px'><b>Jumlah Robux:</b> " + Number(data.robux_amount || 0).toLocaleString("id-ID") + " Robux</div>" +
-                "<div style='margin-top:8px'><b>Total:</b> " + rupiahTopup(data.total_price) + "</div>" +
-                "<div style='margin-top:8px'><b>Pembayaran:</b> " + escapeHtml(data.payment_method || "-") + "</div>" +
+                "<div><b>ID Order:</b> " + escapeHtml(order.order_code || "-") + "</div>" +
+                "<div style='margin-top:8px'><b>Username Roblox:</b> " + escapeHtml(order.roblox_username || "-") + "</div>" +
+                "<div style='margin-top:8px'><b>Jumlah Robux:</b> " + Number(order.robux_amount || 0).toLocaleString("id-ID") + " Robux</div>" +
+                "<div style='margin-top:8px'><b>Total:</b> " + rupiahTopup(order.total_price || 0) + "</div>" +
+                "<div style='margin-top:8px'><b>Pembayaran:</b> " + escapeHtml(order.payment_method || "-") + "</div>" +
                 "<div style='margin-top:8px'><b>Tanggal:</b> " + escapeHtml(created) + "</div>" +
                 "<div class='order-status'>" + escapeHtml(statusLabel) + "</div>";
             return;
